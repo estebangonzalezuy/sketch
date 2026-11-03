@@ -1,4 +1,3 @@
-import { PixelHeadline } from '../components/PixelHeadline';
 import { facets, SOURCE_INFO, studios } from '../lib/data';
 import { useMeta } from '../lib/meta';
 import type { Source } from '../types';
@@ -12,14 +11,14 @@ export function AboutPage() {
   const both = studios.filter((s) => s.sources.length > 1).length;
   return (
     <div className="page prose">
-      <PixelHeadline text="About" className="title-lg" />
+      <h1 className="display page-title">About</h1>
       <p className="lead">
         A numbered index of {studios.length} motion design studios around the world. It is a
         browsable reference for motion designers looking for where the work happens, made by The
         Motion Social Club (tMSC) as part of Human + Tool.
       </p>
 
-      <h2 className="label section-label">Sources</h2>
+      <h2 className="section-label">Sources</h2>
       <ol className="sources">
         {(Object.keys(SOURCE_INFO) as Source[]).map((k) => {
           const s = SOURCE_INFO[k];
@@ -28,7 +27,7 @@ export function AboutPage() {
               <p className="source-title">
                 “{s.title}”, {s.by}
               </p>
-              <p className="label muted">
+              <p className="small muted">
                 <a href={s.url} target="_blank" rel="noopener noreferrer">
                   {s.host} ↗
                 </a>{' '}
@@ -43,7 +42,7 @@ export function AboutPage() {
         list it came from.
       </p>
 
-      <h2 className="label section-label">Methodology</h2>
+      <h2 className="section-label">Methodology</h2>
       <ul className="method">
         <li>The two lists were merged and deduplicated by studio name or website domain.</li>
         <li>
@@ -64,16 +63,16 @@ export function AboutPage() {
         </li>
       </ul>
 
-      <h2 className="label section-label">Caveats</h2>
+      <h2 className="section-label">Caveats</h2>
       <p>
         Studios open, close, merge and move. The data may be outdated and links may break. Websites
         were not checked when the index was built.
       </p>
 
-      <h2 className="label section-label">Colophon</h2>
+      <h2 className="section-label">Colophon</h2>
       <p>
-        Set in Geist Sans. Headlines are rendered as a bitmap, six pixels to a cell. Static site, no
-        tracking, no runtime requests to third parties.
+        Set in Instrument Serif and Geist Sans. A static site with no tracking and no runtime
+        requests to third parties.
       </p>
     </div>
   );

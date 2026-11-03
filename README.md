@@ -1,8 +1,7 @@
 # Motion Studios Index
 
 A drifting, numbered index of 779 motion design studios worldwide, Nº 001 to Nº 779.
-Sourced, not generated. By The Motion Social Club (tMSC), part of Human + Tool.
-
+Sourced, not generated.
 Static site: Vite, React and TypeScript. There is no server, database or runtime fetch. Deploys to Vercel.
 
 ## Run it
@@ -52,10 +51,9 @@ its own title, description and Open Graph tags, so shared links preview correctl
 
 ## How it works
 
-- `src/components/PixelHeadline.tsx` draws text at font size ÷ cell on an offscreen canvas,
-  thresholds it, and paints each lit pixel as a square cell. Cells are about 6px, and smaller on phones
-  so letters stay legible. The real text stays in the DOM (`sr-only`). It redraws on resize, font load,
-  theme change and DPR change.
+- Typography: Instrument Serif (display, names, values) and Geist Sans (labels, meta), both
+  self-hosted from `public/fonts/`. The palette is ivory and ink with an oxblood accent, plus a dark
+  mode with the inverse.
 - `src/lib/drift.ts` runs the auto-scroll at 24 px/s with `requestAnimationFrame`. It pauses on hover
   or focus inside the list and controls, on wheel, touch, key or pointer input (resuming after 3.5 s),
   and when the tab is hidden. It is off by default under `prefers-reduced-motion`.
@@ -74,6 +72,7 @@ Keyboard: `/` focuses search, `Esc` clears it, `↑`/`↓` move between rows, `E
 - **notion**: “Motion Design Studios”, a list compiled by SK Robert ([skrowbear.com](https://skrowbear.com)).
 - **som**: “500 Studios You Need to Know”, School of Motion
   ([schoolofmotion.com/landing-page/500-studios](https://www.schoolofmotion.com/landing-page/500-studios)).
-- Geist Sans by Vercel, SIL Open Font License (`public/fonts/LICENSE.txt`).
+- Instrument Serif by the Instrument Serif Project Authors and Geist Sans by Vercel, both under
+  the SIL Open Font License (`public/fonts/`).
 
 The data may be outdated. Studio names and websites belong to their owners.

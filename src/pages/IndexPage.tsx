@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FacetMenu } from '../components/FacetMenu';
-import { PixelHeadline } from '../components/PixelHeadline';
 import { StudioRow } from '../components/StudioRow';
 import { facets, SOURCE_LABEL, studios } from '../lib/data';
 import { useDrift } from '../lib/drift';
@@ -167,18 +166,39 @@ export function IndexPage() {
   return (
     <>
       <section className="hero" data-drift-pause>
-        <PixelHeadline text="Motion Studios Index" className="title-xl" />
-        <p className="tagline">{total} motion studios. Sourced, not generated.</p>
+        <h1 className="display">
+          Motion Studios <em>Index</em>
+        </h1>
+        <div className="hero-side">
+          <p className="intro">
+            A catalogue of {total} motion design studios, gathered from two public lists and
+            numbered in alphabetical order. Sourced, not generated.
+          </p>
+          <dl className="stats">
+            <div>
+              <dt>Studios</dt>
+              <dd className="num">{total}</dd>
+            </div>
+            <div>
+              <dt>Countries</dt>
+              <dd className="num">{facets.countries.length}</dd>
+            </div>
+            <div>
+              <dt>Cities</dt>
+              <dd className="num">{facets.cities.length}</dd>
+            </div>
+          </dl>
+        </div>
         <div className="search">
-          <label htmlFor="search" className="label">
-            Search
+          <label htmlFor="search" className="sr-only">
+            Search studios
           </label>
           <input
             id="search"
             ref={searchRef}
             type="search"
             value={q}
-            placeholder="Name, city, country or domain"
+            placeholder="Search by name, city, country or domain"
             autoComplete="off"
             spellCheck={false}
             onChange={(e) => setQ(e.target.value)}
@@ -192,17 +212,16 @@ export function IndexPage() {
               }
             }}
           />
-          <kbd aria-hidden="true">/</kbd>
+          <span className="search-hint label" aria-hidden="true">
+            Press <kbd>/</kbd> · <kbd>↑</kbd>
+            <kbd>↓</kbd> to browse
+          </span>
         </div>
-        <p className="hint label" aria-hidden="true">
-          Scroll to explore · Use ↑ ↓ or Tab · Press / to search
-        </p>
       </section>
 
       <div className="toolbar" role="region" aria-label="Filters and sorting">
         <div className="toolbar-inner">
           <div className="filters" data-drift-pause>
-            <span className="label muted toolbar-label">Filter</span>
             <FacetMenu
               label="Country"
               options={countryOpts}
@@ -230,18 +249,18 @@ export function IndexPage() {
               format={(v) => SOURCE_LABEL[v as Source] ?? v}
             />
             {filtered && (
-              <button type="button" className="link-btn label" onClick={clearAll}>
+              <button type="button" className="text-btn clear" onClick={clearAll}>
                 Clear all
               </button>
             )}
           </div>
           <div className="sorts" data-drift-pause role="group" aria-label="Sort">
-            <span className="label muted toolbar-label">Sort</span>
+            <span className="muted">Order</span>
             {SORTS.map((s) => (
               <button
                 key={s.key}
                 type="button"
-                className={`chip${state.sort === s.key ? ' is-active' : ''}`}
+                className={`text-btn${state.sort === s.key ? ' is-active' : ''}`}
                 aria-pressed={state.sort === s.key}
                 onClick={() =>
                   update(
@@ -252,41 +271,26 @@ export function IndexPage() {
                   s.key === 'shuffle' && state.sort === 'shuffle' ? 'Shuffle again' : undefined
                 }
               >
-                {s.key === 'no' ? (
-                  <>
-                    <span aria-hidden="true">
-                      N<span className="ord">o</span>
-                    </span>
-                    <span className="sr-only">Number</span>
-                  </>
-                ) : (
-                  s.label
-                )}
+                {s.key === 'no' ? 'Number' : s.label}
               </button>
             ))}
           </div>
           <div className="status">
-            <p className="label count" aria-live="polite">
-              Showing <span className="num">{list.length}</span> of{' '}
-              <span className="num">{total}</span> studios
+            <p className="count" aria-live="polite">
+              <span className="num">{list.length}</span>
+              <span className="muted"> of {total}</span>
             </p>
             <button
               type="button"
-              className="label drift-toggle"
+              className="text-btn drift-toggle"
               data-drift-toggle
               aria-pressed={drift.on}
               onClick={drift.toggle}
             >
               <span className={`drift-dot is-${drift.status}`} aria-hidden="true" />
-              Automatic motion: {drift.on ? 'on' : 'off'}
-              <span className="muted drift-state" aria-hidden="true">
-                {drift.on
-                  ? drift.status === 'paused'
-                    ? '· paused'
-                    : '· drifting'
-                  : drift.reduced
-                    ? '· reduced motion'
-                    : ''}
+              Motion {drift.on ? 'on' : 'off'}
+              <span className="sr-only">
+                {drift.on && drift.status === 'paused' ? ', paused' : ''}
               </span>
             </button>
           </div>
@@ -297,7 +301,7 @@ export function IndexPage() {
         <div className="empty">
           <p>
             No studios match.{' '}
-            <button type="button" className="link-btn" onClick={clearAll}>
+            <button type="button" className="text-btn" onClick={clearAll}>
               Clear filters
             </button>
           </p>
@@ -311,18 +315,16 @@ export function IndexPage() {
       )}
       <div ref={sentinel} className="sentinel" aria-hidden="true" />
       {count < list.length && (
-        <p className="label muted more">
-          <button
-            type="button"
-            className="link-btn label"
-            onClick={() => setCount((c) => c + CHUNK)}
-          >
-            Show more ({list.length - count} left)
+        <p className="more">
+          <button type="button" className="text-btn" onClick={() => setCount((c) => c + CHUNK)}>
+            Show more <span className="muted">({list.length - count} left)</span>
           </button>
         </p>
       )}
       {count >= list.length && list.length > 0 && (
-        <p className="label muted end">End of index · {list.length} entries</p>
+        <p className="end">
+          <em>End of the index</em> <span className="muted">· {list.length} entries</span>
+        </p>
       )}
     </>
   );

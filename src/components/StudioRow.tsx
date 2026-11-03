@@ -1,56 +1,63 @@
 import { memo } from 'react';
 import { no, SOURCE_LABEL } from '../lib/data';
-import { No } from './No';
 import { Link } from '../lib/router';
 import type { Studio } from '../types';
-
-export function locationLine(s: Studio): string {
-  const city = s.cities.join(', ');
-  const country = s.countries.join(', ');
-  return [city, country].filter(Boolean).join(' — ');
-}
+import { No } from './No';
 
 export const SourceBadges = ({ s }: { s: Studio }) => (
-  <span className="badges">
-    {s.sources.map((src) => (
-      <span key={src} className={`badge badge-${src}`} title={`Source: ${SOURCE_LABEL[src]}`}>
-        {src === 'notion' ? 'SKR' : 'SoM'}
-        <span className="sr-only"> (source: {SOURCE_LABEL[src]})</span>
+  <span className="sources-inline">
+    {s.sources.map((src, i) => (
+      <span key={src} title={`Source: ${SOURCE_LABEL[src]}`}>
+        {i > 0 && <span aria-hidden="true"> · </span>}
+        <span aria-hidden="true">{src === 'notion' ? 'SKR' : 'SoM'}</span>
+        <span className="sr-only">Source: {SOURCE_LABEL[src]}</span>
       </span>
     ))}
   </span>
 );
 
 export const StudioRow = memo(function StudioRow({ s, search }: { s: Studio; search: string }) {
-  const loc = locationLine(s);
+  const city = s.cities.join(', ');
+  const country = s.countries.join(', ');
   return (
     <li className="row">
-      <span className="row-no num" aria-hidden="true">
+      <span className="row-no" aria-hidden="true">
         <No n={s.id} />
       </span>
       <div className="row-main">
         <Link to={`/s/${s.slug}${search}`} className="row-link" data-row-link>
           <span className="sr-only">{no(s.id)}: </span>
-          {s.name}
+          <span className="row-name">{s.name}</span>
+          <span className="row-arrow" aria-hidden="true">
+            →
+          </span>
         </Link>
-        <p className="row-meta label">{loc || <span className="unknown">Location unknown</span>}</p>
         {s.specialties.length > 0 && (
-          <ul className="tags" aria-label="Specialties">
-            {s.specialties.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
+          <p className="row-spec">
+            <span className="sr-only">Specialties: </span>
+            {s.specialties.join(', ')}
+          </p>
         )}
       </div>
+      <p className="row-loc">
+        {city || country ? (
+          <>
+            {city && <span className="row-city">{city}</span>}
+            {country && <span className="row-country">{country}</span>}
+          </>
+        ) : (
+          <span className="unknown">Location unknown</span>
+        )}
+      </p>
       <div className="row-aside">
         <SourceBadges s={s} />
         {s.website ? (
-          <a className="visit label" href={s.website} target="_blank" rel="noopener noreferrer">
-            Visit<span className="sr-only"> {s.name} website (opens in new tab)</span>{' '}
-            <span aria-hidden="true">↗</span>
+          <a className="visit" href={s.website} target="_blank" rel="noopener noreferrer">
+            Visit<span className="sr-only"> {s.name} website (opens in new tab)</span>
+            <span aria-hidden="true">{'\u00a0↗'}</span>
           </a>
         ) : (
-          <span className="visit label unknown">No site</span>
+          <span className="visit unknown">No site</span>
         )}
       </div>
     </li>

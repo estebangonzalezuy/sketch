@@ -57,16 +57,14 @@ export function FacetMenu({
       <button
         ref={button}
         type="button"
-        className={`chip${selected.length ? ' is-active' : ''}`}
+        className={`facet-btn${selected.length ? ' is-active' : ''}`}
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen((o) => !o)}
       >
         {label}
-        {selected.length > 0 && <span className="chip-count">{selected.length}</span>}
-        <span aria-hidden="true" className="chev">
-          ▾
-        </span>
+        {selected.length > 0 && <sup className="facet-sel">{selected.length}</sup>}
+        <span aria-hidden="true" className="chev" />
       </button>
       <div id={id} className="facet-panel" hidden={!open}>
         {open && (
@@ -92,7 +90,7 @@ export function FacetMenu({
               </ul>
             </fieldset>
             {selected.length > 0 && (
-              <button type="button" className="link-btn label" onClick={() => onChange([])}>
+              <button type="button" className="text-btn small" onClick={() => onChange([])}>
                 Clear {label.toLowerCase()}
               </button>
             )}

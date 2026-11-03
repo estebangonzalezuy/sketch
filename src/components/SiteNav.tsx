@@ -15,8 +15,8 @@ export function SiteNav() {
       <a className="skip" href="#main">
         Skip to content
       </a>
-      <Link to="/" className="brand label">
-        Motion Studios Index <span className="muted">· tMSC</span>
+      <Link to="/" className="brand">
+        Motion Studios <em>Index</em>
       </Link>
       <nav aria-label="Site">
         <ul>
@@ -25,7 +25,7 @@ export function SiteNav() {
               l.to === '/' ? pathname === '/' || pathname.startsWith('/s/') : pathname === l.to;
             return (
               <li key={l.to}>
-                <Link to={l.to} className="label" aria-current={current ? 'page' : undefined}>
+                <Link to={l.to} aria-current={current ? 'page' : undefined}>
                   {l.label}
                 </Link>
               </li>
@@ -34,7 +34,7 @@ export function SiteNav() {
           <li>
             <button
               type="button"
-              className="label theme-toggle"
+              className="text-btn theme-toggle"
               onClick={toggle}
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
             >
@@ -51,23 +51,25 @@ export function SiteNav() {
 
 export function SiteFooter() {
   return (
-    <footer className="site-footer label">
-      <p>
-        Data:{' '}
+    <footer className="site-footer">
+      <p className="footer-mark">
+        Motion Studios <em>Index</em>
+      </p>
+      <p className="muted">
+        Compiled from{' '}
         <a href="https://skrowbear.com" target="_blank" rel="noopener noreferrer">
-          SK Robert ↗
+          SK Robert
         </a>{' '}
-        &amp;{' '}
+        and{' '}
         <a
           href="https://www.schoolofmotion.com/landing-page/500-studios"
           target="_blank"
           rel="noopener noreferrer"
         >
-          School of Motion ↗
+          School of Motion
         </a>
         . Blanks left blank.
       </p>
-      <p>A Human + Tool project by The Motion Social Club.</p>
     </footer>
   );
 }

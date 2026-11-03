@@ -1,5 +1,4 @@
 import { useMemo, type ReactNode } from 'react';
-import { PixelHeadline } from '../components/PixelHeadline';
 import { No } from '../components/No';
 import { SourceBadges } from '../components/StudioRow';
 import { no, SOURCE_LABEL, studios } from '../lib/data';
@@ -21,10 +20,10 @@ function Field({
 }) {
   return (
     <div className="field">
-      <dt className="label">{label}</dt>
+      <dt>{label}</dt>
       <dd>
         <div className="field-value">{children}</div>
-        <div className="field-src label muted">{source}</div>
+        <div className="field-src">{source}</div>
       </dd>
     </div>
   );
@@ -65,7 +64,7 @@ export function StudioPage({ studio: s }: { studio: Studio }) {
 
   return (
     <article className="studio">
-      <nav className="studio-top label" aria-label="Studio navigation">
+      <nav className="studio-top" aria-label="Studio navigation">
         <Link to={`/${search}`}>← Back to index</Link>
         {scoped && (
           <span className="muted">
@@ -77,19 +76,19 @@ export function StudioPage({ studio: s }: { studio: Studio }) {
       <p className="studio-no num" aria-hidden="true">
         <No n={s.id} />
       </p>
-      <PixelHeadline text={s.name} className="title-lg" />
+      <h1 className="display studio-name">{s.name}</h1>
       <p className="sr-only">Entry {no(s.id)}</p>
       <div className="studio-badges">
         <SourceBadges s={s} />
         {s.website && (
-          <a className="visit label" href={s.website} target="_blank" rel="noopener noreferrer">
+          <a className="visit" href={s.website} target="_blank" rel="noopener noreferrer">
             Visit site ↗
           </a>
         )}
       </div>
 
       <section aria-labelledby="glance">
-        <h2 id="glance" className="label section-label">
+        <h2 id="glance" className="section-label">
           At a glance
         </h2>
         <dl className="glance">
@@ -122,7 +121,7 @@ export function StudioPage({ studio: s }: { studio: Studio }) {
             source={s.specialties.length ? `Source: ${SOURCE_LABEL.notion}` : srcLabel}
           >
             {s.specialties.length ? (
-              <ul className="tags">
+              <ul className="spec-list">
                 {s.specialties.map((t) => (
                   <li key={t}>
                     <Link to={`/?specialty=${encodeURIComponent(t)}`}>{t}</Link>
@@ -159,13 +158,13 @@ export function StudioPage({ studio: s }: { studio: Studio }) {
 
       <nav className="pager" aria-label="Previous and next studio">
         <Link to={`/s/${prev.slug}${keep}`} rel="prev" className="pager-link">
-          <span className="label muted">
+          <span className="pager-kicker">
             ← Previous · <No n={prev.id} />
           </span>
           <span className="pager-name">{prev.name}</span>
         </Link>
         <Link to={`/s/${next.slug}${keep}`} rel="next" className="pager-link pager-next">
-          <span className="label muted">
+          <span className="pager-kicker">
             Next · <No n={next.id} /> →
           </span>
           <span className="pager-name">{next.name}</span>

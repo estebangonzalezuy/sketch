@@ -1,4 +1,3 @@
-import { PixelHeadline } from '../components/PixelHeadline';
 import { facets, studios } from '../lib/data';
 import { useMeta } from '../lib/meta';
 import { Link } from '../lib/router';
@@ -44,7 +43,7 @@ export function CitiesPage() {
   );
   return (
     <div className="page">
-      <PixelHeadline text="Cities" className="title-lg" />
+      <h1 className="display page-title">Cities</h1>
       <p className="tagline">
         {facets.countries.length} countries · {facets.cities.length} cities. Studios with several
         offices count in each.
@@ -65,7 +64,7 @@ export function CitiesPage() {
               {g.country && <span className="num muted">{g.total}</span>}
             </h2>
             {!g.country && (
-              <p className="label muted note">
+              <p className="note">
                 These cities only appear on multi-office entries where the source does not pair
                 cities with countries.
               </p>
