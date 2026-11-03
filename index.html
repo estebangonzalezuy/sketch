@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // Runs before first paint so the stored or system theme never flashes.
+      (function () {
+        var t = null;
+        try {
+          t = localStorage.getItem('theme');
+        } catch (e) {}
+        var dark =
+          t === 'dark' ||
+          (t !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var el = document.documentElement;
+        el.setAttribute('data-theme', dark ? 'dark' : 'light');
+        el.style.colorScheme = dark ? 'dark' : 'light';
+      })();
+    </script>
+    <title>Motion Studios Index — 779 motion design studios</title>
+    <meta
+      name="description"
+      content="A drifting, numbered index of 779 motion design studios worldwide. Filter by country, city, specialty and source. Sourced, not generated."
+    />
+    <meta name="theme-color" content="#f3f1ec" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="/fonts/geist-sans-latin-800-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/geist-sans-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Motion Studios Index" />
+    <meta property="og:title" content="Motion Studios Index — 779 motion design studios" />
+    <meta
+      property="og:description"
+      content="A drifting, numbered index of 779 motion design studios worldwide. Sourced, not generated."
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <!-- og:url, og:image and canonical are injected per page by scripts/prerender-meta.ts -->
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript
+      ><p style="padding: 24px">
+        The Motion Studios Index needs JavaScript to browse and filter.
+      </p></noscript
+    >
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
