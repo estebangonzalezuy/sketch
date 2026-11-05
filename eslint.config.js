@@ -17,7 +17,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/lib/**', 'src/components/StudioRow.tsx'],
+    files: ['src/lib/**', 'src/components/StudioRow.tsx', 'src/tools/**', 'src/styleframe/**'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },
