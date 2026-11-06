@@ -1,0 +1,33 @@
+{
+  "name": "motion-builder",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "dialkit": "2.1.0",
+    "fflate": "0.8.2",
+    "motion": "14.9.0",
+    "mp4-muxer": "5.2.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "three": "0.169.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@types/three": "0.169.0",
+    "@vitejs/plugin-react": "4.3.4",
+    "playwright-core": "1.64.1",
+    "typescript": "5.6.3",
+    "vite": "5.4.10",
+    "vitest": "2.1.9"
+  }
+}

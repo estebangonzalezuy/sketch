@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <body style="margin: 0; background: #000">
+    <div id="root" style="position: relative; width: 1280px; height: 720px"></div>
+    <script type="module">
+      import '/src/fonts.css';
+      import { createElement } from 'react';
+      import { createRoot } from 'react-dom/client';
+      import Ascii from '/docs/editor/sources/AsciiTextBackground.tsx';
+      window.mountAscii = async (props) => {
+        await document.fonts.load('10px "IBM Plex Mono"');
+        createRoot(document.getElementById('root')).render(createElement(Ascii, props));
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+node_modules
+dist
+out
+.DS_Store
+*.log
+# KMR Apparat es comercial: nunca al repo
+public/fonts/kmr-apparat*

@@ -1,0 +1,11 @@
+{
+  "Clay": { "look": "clay", "face": "#ECE8E1", "side": "#D9D3C9", "roughness": 0.9, "metalness": 0 },
+  "Plástico": { "look": "plastic", "face": "#3A5BFF", "side": "#2340C9", "roughness": 0.4, "metalness": 0 },
+  "Brillante": { "look": "glossy", "face": "#FF5A8A", "side": "#C9305F", "roughness": 0.12, "metalness": 0 },
+  "Cromo": { "look": "chrome", "face": "#F2F4F7", "side": "#CFD3DA", "roughness": 0.04, "metalness": 1 },
+  "Oro": { "look": "gold", "face": "#E7B84A", "side": "#B98A2A", "roughness": 0.18, "metalness": 1 },
+  "Cepillado": { "look": "brushed", "face": "#B9BEC7", "side": "#8D939D", "roughness": 0.38, "metalness": 1 },
+  "Vidrio": { "look": "glass", "face": "#E9F4FF", "side": "#CFE6FF", "roughness": 0.03, "metalness": 0 },
+  "Neón": { "look": "neon", "face": "#3DF2FF", "side": "#0D5F7A", "roughness": 0.5, "metalness": 0 },
+  "Tinta": { "look": "ink", "face": "#161616", "side": "#0B0B0B", "roughness": 0.6, "metalness": 0 }
+}

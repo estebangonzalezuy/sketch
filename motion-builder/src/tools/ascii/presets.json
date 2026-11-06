@@ -1,0 +1,6 @@
+{
+  "Oscuro": { "colorMode": "dark", "showPattern": false, "invert": false },
+  "Claro": { "colorMode": "light", "showPattern": false, "invert": false },
+  "Color denso": { "colorMode": "color", "chars": "@", "showPattern": false },
+  "Con patrón": { "colorMode": "dark", "showPattern": true }
+}

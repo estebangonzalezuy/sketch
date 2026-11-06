@@ -1,0 +1,14 @@
+{
+  "Inception · Calidad vs. tamaño": {
+    "title": "Model Quality vs. Model Size",
+    "subtitle": "Five Mercury generations, from M1 (mini) to M3",
+    "xLabel": "Total parameters, relative to Mercury 1 (Mini) (log scale)",
+    "yLabel": "Model Quality*",
+    "xSuffix": "×",
+    "xScale": "log",
+    "type": "path",
+    "data": "M1 (MINI) ~5× faster | 1 | 16 | FEB 2025 | than Gemini 2.0 Flash Lite | ld\nM1 (SMALL) ~4× faster | 2 | 18.5 | FEB 2025 | than Gemini 2.0 Flash Lite | lu\nM2 ~10× faster | 17 | 31.8 | FEB 2026 | than Claude Haiku 4.5 | r\nM2.5 ~10× faster | 18 | 36 | SEP 2026 | than GPT-5.6 Luna | lu\nM3 ~8× faster | 40 | 50.5 | OCT 2026 | than GPT-6 Luna | l"
+  },
+  "Fondo oscuro": { "ground": "#101211", "ink": "#ECEFEC", "muted": "#7F8784", "accent": "#5FC7C7" },
+  "Sin fondo": { "background": false }
+}

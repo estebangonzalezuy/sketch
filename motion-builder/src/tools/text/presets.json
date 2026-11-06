@@ -1,0 +1,4 @@
+{
+  "Título grande": { "size": 320, "tracking": -0.01, "align": "center", "unitBy": "chars", "stagger": 0.6, "rise": 60 },
+  "Línea a línea": { "size": 96, "lineHeight": 1.15, "align": "left", "unitBy": "lines", "stagger": 0.4, "rise": 24 }
+}

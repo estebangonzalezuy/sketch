@@ -1,0 +1,154 @@
+{
+  "id": "reboot",
+  "name": "Reboot",
+  "palettes": [
+    {
+      "name": "Azul + blanco",
+      "tones": "2",
+      "c0": "#0000FF",
+      "c1": "#8080FF",
+      "c2": "#FFFFFF",
+      "invert": false
+    },
+    {
+      "name": "Rojo + negro",
+      "tones": "2",
+      "c0": "#FF0000",
+      "c1": "#800000",
+      "c2": "#000000",
+      "invert": true
+    },
+    {
+      "name": "Blanco + azul",
+      "tones": "2",
+      "c0": "#FFFFFF",
+      "c1": "#8080FF",
+      "c2": "#0000FF",
+      "invert": true
+    },
+    {
+      "name": "3 tonos · azul/rojo/blanco",
+      "tones": "3",
+      "c0": "#0000FF",
+      "c1": "#FF0000",
+      "c2": "#FFFFFF",
+      "invert": false
+    },
+    {
+      "name": "3 tonos · negro/rojo/blanco",
+      "tones": "3",
+      "c0": "#000000",
+      "c1": "#FF0000",
+      "c2": "#FFFFFF",
+      "invert": false
+    }
+  ],
+  "fonts": [
+    "KMR Apparat",
+    "Geist Mono"
+  ],
+  "formats": [
+    [
+      3840,
+      2160
+    ],
+    [
+      1920,
+      1080
+    ],
+    [
+      1080,
+      1920
+    ],
+    [
+      1080,
+      1350
+    ],
+    [
+      1080,
+      1080
+    ]
+  ],
+  "rules": [],
+  "pending": [
+    "Confirmar qué paletas son oficiales: estas salen de los presets de Tag Shader.",
+    "Confirmar fuentes oficiales: estas son las que usan las tools.",
+    "Confirmar formatos oficiales.",
+    "Licencia de KMR Apparat si el editor se comparte."
+  ],
+  "projects": [
+    {
+      "name": "Texto 3D a mosaico",
+      "project": {
+        "version": 1,
+        "name": "Texto 3D a mosaico",
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "durationFrames": 150,
+        "brandTemplateId": "reboot",
+        "assets": [],
+        "layers": [
+          {
+            "id": "mosaico",
+            "name": "Mosaico",
+            "toolId": "tag-shader",
+            "toolVersion": 1,
+            "start": 0,
+            "durationFrames": 150,
+            "visible": true,
+            "blend": "normal",
+            "opacity": {
+              "value": 1
+            },
+            "seed": 7,
+            "loopFrames": null,
+            "inputs": {
+              "source": {
+                "layerId": "texto3d"
+              }
+            },
+            "params": {
+              "rowHeight": {
+                "value": 22
+              }
+            }
+          },
+          {
+            "id": "texto3d",
+            "name": "Texto 3D",
+            "toolId": "text-extruder",
+            "toolVersion": 1,
+            "start": 0,
+            "durationFrames": 150,
+            "visible": false,
+            "blend": "normal",
+            "opacity": {
+              "value": 1
+            },
+            "seed": 7,
+            "loopFrames": null,
+            "inputs": {},
+            "params": {
+              "text": {
+                "value": "REBOOT"
+              },
+              "anim": {
+                "value": "turntable"
+              },
+              "speed": {
+                "value": 0.1
+              },
+              "floor": {
+                "value": false
+              },
+              "look": {
+                "value": "clay"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
