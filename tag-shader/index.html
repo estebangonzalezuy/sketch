@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tag Shader</title>
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <button id="toggle" class="toggle" title="Mostrar u ocultar controles (H)">Controles</button>
+    <aside id="panel" class="panel">
+      <header class="panel-head">
+        <h1>Tag Shader</h1>
+        <p id="status" class="status">Cargando…</p>
+        <div class="actions">
+          <button id="play">Pausa</button>
+          <button id="export">PNG</button>
+          <button id="reset">Restablecer</button>
+        </div>
+        <div class="actions">
+          <button id="load-image">Cargar imagen</button>
+          <button id="clear-image" hidden>Usar demo</button>
+          <input id="file" type="file" accept="image/*" hidden />
+        </div>
+        <label class="row"><span class="row-label">preset</span>
+          <select id="preset"><option value="">Elegir…</option></select>
+        </label>
+        <label class="row"><span class="row-label">seed</span>
+          <input id="seed" type="number" step="1" class="num wide" />
+        </label>
+      </header>
+      <div id="params"></div>
+    </aside>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

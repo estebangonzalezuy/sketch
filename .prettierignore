@@ -4,3 +4,4 @@ src/data/*.json
 data
 package-lock.json
 motion-builder
+tag-shader
