@@ -1,0 +1,219 @@
+{
+  "id": "tmsc",
+  "name": "tMSC",
+  "palettes": [
+    {
+      "name": "lavanda/negro",
+      "tones": "2",
+      "c0": "#ADBFFD",
+      "c1": "#000000",
+      "c2": "#000000",
+      "invert": false
+    },
+    {
+      "name": "naranja/negro",
+      "tones": "2",
+      "c0": "#EE5B33",
+      "c1": "#000000",
+      "c2": "#000000",
+      "invert": false
+    },
+    {
+      "name": "azul/blanco",
+      "tones": "2",
+      "c0": "#0000FF",
+      "c1": "#FFFFFF",
+      "c2": "#FFFFFF",
+      "invert": false
+    },
+    {
+      "name": "negro/blanco",
+      "tones": "2",
+      "c0": "#000000",
+      "c1": "#FFFFFF",
+      "c2": "#FFFFFF",
+      "invert": false
+    },
+    {
+      "name": "amarillo/negro",
+      "tones": "2",
+      "c0": "#F4C500",
+      "c1": "#000000",
+      "c2": "#000000",
+      "invert": false
+    },
+    {
+      "name": "blanco/negro",
+      "tones": "2",
+      "c0": "#FFFFFF",
+      "c1": "#000000",
+      "c2": "#000000",
+      "invert": false
+    },
+    {
+      "name": "rosa/negro",
+      "tones": "2",
+      "c0": "#FF3B94",
+      "c1": "#000000",
+      "c2": "#000000",
+      "invert": false
+    },
+    {
+      "name": "rojo/blanco",
+      "tones": "2",
+      "c0": "#FF0000",
+      "c1": "#FFFFFF",
+      "c2": "#FFFFFF",
+      "invert": false
+    },
+    {
+      "name": "amarillo/rojo",
+      "tones": "2",
+      "c0": "#F4C500",
+      "c1": "#FF0000",
+      "c2": "#FF0000",
+      "invert": false
+    },
+    {
+      "name": "gris claro/negro",
+      "tones": "2",
+      "c0": "#D0D0D0",
+      "c1": "#000000",
+      "c2": "#000000",
+      "invert": false
+    },
+    {
+      "name": "violeta/blanco",
+      "tones": "2",
+      "c0": "#3D2BD8",
+      "c1": "#FFFFFF",
+      "c2": "#FFFFFF",
+      "invert": false
+    }
+  ],
+  "fonts": [
+    "Archivo Narrow"
+  ],
+  "formats": [
+    [
+      1080,
+      1350
+    ],
+    [
+      1080,
+      1080
+    ],
+    [
+      1080,
+      1920
+    ]
+  ],
+  "rules": [
+    "Dos colores por pieza: fondo y tinta.",
+    "Sin terceros colores, degradés ni sombras.",
+    "Archivo Narrow, titulares en 700.",
+    "Esquinas rectas."
+  ],
+  "pending": [
+    "El editor no bloquea un tercer color: la regla es visible, no forzada.",
+    "Falta confirmar la licencia de Archivo Narrow para las plantillas."
+  ],
+  "projects": [
+    {
+      "name": "Post IG 4:5",
+      "project": {
+        "version": 1,
+        "name": "Post IG 4:5",
+        "width": 1080,
+        "height": 1350,
+        "fps": 30,
+        "durationFrames": 150,
+        "brandTemplateId": "tmsc",
+        "assets": [],
+        "layers": [
+          {
+            "id": "titulo",
+            "name": "Título",
+            "toolId": "text",
+            "toolVersion": 1,
+            "start": 0,
+            "durationFrames": 150,
+            "visible": true,
+            "blend": "normal",
+            "opacity": {
+              "value": 1
+            },
+            "seed": 7,
+            "loopFrames": null,
+            "inputs": {},
+            "params": {
+              "text": {
+                "value": "TÍTULO\nDEL POST"
+              },
+              "family": {
+                "value": "Archivo Narrow"
+              },
+              "weight": {
+                "value": 700
+              },
+              "size": {
+                "value": 180
+              },
+              "lineHeight": {
+                "value": 0.95
+              },
+              "align": {
+                "value": "left"
+              },
+              "position": {
+                "value": [
+                  0.074,
+                  0.5
+                ]
+              },
+              "color": {
+                "value": "#000000"
+              }
+            }
+          },
+          {
+            "id": "fondo",
+            "name": "Fondo",
+            "toolId": "tag-shader",
+            "toolVersion": 1,
+            "start": 0,
+            "durationFrames": 150,
+            "visible": true,
+            "blend": "normal",
+            "opacity": {
+              "value": 1
+            },
+            "seed": 7,
+            "loopFrames": null,
+            "inputs": {},
+            "params": {
+              "family": {
+                "value": "Archivo Narrow"
+              },
+              "c0": {
+                "value": "#ADBFFD"
+              },
+              "c1": {
+                "value": "#000000"
+              },
+              "c2": {
+                "value": "#000000"
+              },
+              "density": {
+                "value": 0.18
+              },
+              "rowHeight": {
+                "value": 30
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

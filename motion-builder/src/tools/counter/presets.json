@@ -1,0 +1,6 @@
+{
+  "Velocidad": { "from": 0, "to": 1068, "caption": "tokens per second", "suffix": "", "prefix": "", "decimals": 0 },
+  "Precio": { "from": 0, "to": 0.2, "decimals": 2, "prefix": "$", "caption": "per million input tokens", "separator": "ninguno" },
+  "Porcentaje": { "from": 0, "to": 78, "suffix": "%", "caption": "success rate", "decimals": 0 },
+  "Múltiplo": { "from": 1, "to": 40, "suffix": "×", "caption": "larger than Mercury 1", "decimals": 0 }
+}

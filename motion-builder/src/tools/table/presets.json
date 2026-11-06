@@ -1,0 +1,10 @@
+{
+  "Inception · Mercury 3": {
+    "title": "Mercury 3",
+    "subtitle": "Benchmark results vs. models in its class",
+    "highlightColumn": 1,
+    "data": "Benchmark | Mercury 3 | GPT-6 Luna | Claude Haiku 5.5\n# Speed & cost\nOutput speed (tokens/s) | *1,068 | ~130 | ~240\n# Capabilities\nGDPval (Elo) | *1,237.2 | 1,204.0 | 1,225.0\nτ³-bench Banking | *30.24 | 23.00 | 13.06\nMultiChallenge | *60.35 | 51.49 | 52.48\nIFBench | *76.84 | 61.82 | 54.65\n# Agentic coding\nSWE-Bench Atlas | *51.08 | 33.33 | 32.26\nDeepSWE v1 | 46.31 | 37.76 | *51.62\n# Agentic search\nBrowseComp+ | *55.18 | 50.50 | 45.78\nDeepSearchQA | *71.33 | 60.00 | 65.22"
+  },
+  "Fondo oscuro": { "ground": "#101211", "ink": "#ECEFEC", "muted": "#7F8784", "accent": "#5FC7C7", "band": "#1B2A29" },
+  "Sin fondo": { "background": false }
+}

@@ -1,0 +1,6 @@
+{
+  "Mosaico": { "mode": "mosaico", "cell": 24 },
+  "Dos tonos": { "mode": "umbral", "cell": 12, "threshold": 0.5, "ink": "#FFFFFF", "ground": "#0000FF" },
+  "Bayer": { "mode": "bayer", "cell": 8, "ink": "#000000", "ground": "#ADBFFD" },
+  "Bayer sin fondo": { "mode": "bayer", "cell": 6, "transparent": true }
+}
