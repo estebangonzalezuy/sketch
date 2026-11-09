@@ -1,6 +1,6 @@
 # Inception ASCII
 
-Herramienta para pasar imágenes a ASCII y armar transiciones entre ellas. Viene con las 9 cards de los papers de inceptionlabs.ai/about. Exporta texto, PNG, GIF, video y MP4 4K.
+Herramienta para pasar imágenes a ASCII y armar transiciones entre ellas. Viene con 4 cards de los papers de inceptionlabs.ai/about, en el orden de la transición: Block Diffusion, Decision Transformers, Diffusion Models y Direct Preference Optimization. Exporta texto, PNG, GIF, video y MP4 4K.
 
 Es una sola página estática, `index.html`, sin build. Se abre el archivo en el navegador o se sirve la carpeta:
 

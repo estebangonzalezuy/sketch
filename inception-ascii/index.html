@@ -232,17 +232,12 @@ input[aria-invalid="true"] { border-color: #c4320a; }
 <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-// The technologies on inceptionlabs.ai/about, in the site's order, with the authors of each linked paper
+// The four cards of the transition, in playback order, with the authors of each linked paper
 const PAPERS = [
-  { name: 'd1 Reasoning', icon: 'd1', arxiv: '2504.12216', authors: ['Siyan Zhao', 'Devaansh Gupta', 'Qinqing Zheng', 'Aditya Grover'] },
   { name: 'Block Diffusion', icon: 'block', arxiv: '2503.09573', authors: ['Marianne Arriola', 'Aaron Gokaslan', 'Justin T. Chiu', 'Zhihan Yang', 'Zhixuan Qi', 'Jiaqi Han', 'Subham Sekhar Sahoo', 'Volodymyr Kuleshov'] },
-  { name: 'Remasking Diffusion', icon: 'remask', arxiv: '2503.00307', authors: ['Guanghan Wang', 'Yair Schiff', 'Subham Sekhar Sahoo', 'Volodymyr Kuleshov'] },
-  { name: 'Discrete Diffusion Guidance', icon: 'bars', arxiv: '2412.10193', authors: ['Yair Schiff', 'Subham Sekhar Sahoo', 'Hao Phung', 'Guanghan Wang', 'Sam Boshar', 'Hugo Dalla-Torre', 'Bernardo P. de Almeida', 'Alexander Rush', 'Thomas Pierrot', 'Volodymyr Kuleshov'] },
-  { name: 'Masked Diffusion', icon: 'squares', arxiv: '2406.07524', authors: ['Subham Sekhar Sahoo', 'Marianne Arriola', 'Yair Schiff', 'Aaron Gokaslan', 'Edgar Marroquin', 'Justin T. Chiu', 'Alexander Rush', 'Volodymyr Kuleshov'] },
-  { name: 'Direct Preference Optimization', icon: 'dpo', arxiv: '2305.18290', authors: ['Rafael Rafailov', 'Archit Sharma', 'Eric Mitchell', 'Stefano Ermon', 'Christopher D. Manning', 'Chelsea Finn'] },
-  { name: 'Flash Attention', icon: 'flash', arxiv: '2205.14135', authors: ['Tri Dao', 'Daniel Y. Fu', 'Stefano Ermon', 'Atri Rudra', 'Christopher Ré'] },
   { name: 'Decision Transformers', icon: 'layers', arxiv: '2106.01345', authors: ['Lili Chen', 'Kevin Lu', 'Aravind Rajeswaran', 'Kimin Lee', 'Aditya Grover', 'Michael Laskin', 'Pieter Abbeel', 'Aravind Srinivas', 'Igor Mordatch'] },
   { name: 'Diffusion Models', icon: 'hex', arxiv: '2010.02502', authors: ['Jiaming Song', 'Chenlin Meng', 'Stefano Ermon'] },
+  { name: 'Direct Preference Optimization', icon: 'dpo', arxiv: '2305.18290', authors: ['Rafael Rafailov', 'Archit Sharma', 'Eric Mitchell', 'Stefano Ermon', 'Christopher D. Manning', 'Chelsea Finn'] },
 ];
 const TITLE_BOX = [.08, .135, .92, .2], AUTHORS_BOX = [.06, .76, .94, .9];
 function wrapAuthors(names, width = 38) {
@@ -1320,7 +1315,7 @@ function persist() {
       const d = await idb(), t = d.transaction('kv', 'readwrite');
       t.objectStore('kv').put({
         frames: state.frames.map(({ id, name, src, s, texts, paper }) => ({ id, name, src, s, texts, paper })),
-        seq: state.seq, hold: state.hold, fps: state.fps, loop: state.loop, style: state.style, styleV: 3, papersV: 1,
+        seq: state.seq, hold: state.hold, fps: state.fps, loop: state.loop, style: state.style, styleV: 3, papersV: 2,
       }, KEY);
     } catch {}
   }, 400);
@@ -1341,6 +1336,16 @@ async function restore() {
       const fresh = await paperFrames();
       state.frames = [...fresh, ...state.frames.filter(f => !old.has(f.id))];
       state.seq = fresh.map((f, i) => seqItem(f.id, i)); state.link = 0;
+      persist();
+    }
+    if (!(p.papersV >= 2)) {
+      // v2: only the four cards, in order. Keeps the saved style, timing and each kept card's settings;
+      // transitions keep their settings by position.
+      const fresh = await paperFrames();
+      state.frames = fresh.map(f => state.frames.find(o => o.name === f.name) || f);
+      const old = state.seq;
+      state.seq = state.frames.map((f, i) => old[i] ? { ...old[i], id: f.id } : seqItem(f.id, i));
+      state.link = 0;
       persist();
     }
     state.cur = state.frames[0].id;
