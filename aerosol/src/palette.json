@@ -1,0 +1,24 @@
+{
+  "name": "Brand",
+  "paper": "#f4efe4",
+  "colors": [
+    { "name": "Bone", "hex": "#f4efe4" },
+    { "name": "Gold", "hex": "#f2c200" },
+    { "name": "Peach", "hex": "#ff9f87" },
+    { "name": "Hot pink", "hex": "#ff2d78" },
+    { "name": "Red", "hex": "#d8261b" },
+    { "name": "Bordeaux", "hex": "#4f1016" },
+    { "name": "Sky", "hex": "#a9c8f5" },
+    { "name": "Cobalt", "hex": "#1f3fd6" },
+    { "name": "Navy", "hex": "#14204a" },
+    { "name": "Forest", "hex": "#0f2a26" }
+  ],
+  "presets": {
+    "Full": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "Primary": [0, 1, 3, 5, 8],
+    "Duo": [1, 8],
+    "Warm": [0, 1, 2, 3, 4, 5],
+    "Cool": [0, 6, 7, 8, 9]
+  },
+  "text": 5
+}
