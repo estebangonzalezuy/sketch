@@ -6,6 +6,7 @@ import { cruce } from './cruce';
 import { campoPartido } from './campo-partido';
 import { granoPapel } from './grano-papel';
 import { orbita } from './orbita';
+import { ditherField } from './dither-field';
 
 /** Canvases donde dibuja un modo, a la resolución de export. */
 export interface ModeLayers {
@@ -33,4 +34,5 @@ export const IMPLS: Record<string, ModeImpl> = {
   'campo-partido': campoPartido,
   'grano-papel': granoPapel,
   orbita,
+  'dither-field': ditherField,
 };

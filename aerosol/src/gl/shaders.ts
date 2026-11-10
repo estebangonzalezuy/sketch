@@ -178,6 +178,7 @@ uniform sampler2D uBlue;
 uniform float uMatrix;
 uniform float uCell;
 uniform vec4 uKnife;
+uniform float uSort;
 uniform float uPaperSpeck;
 ${NOISE}
 
@@ -341,6 +342,17 @@ void main() {
     // Grain mueve el umbral solo donde la densidad es parcial: los campos planos quedan limpios.
     float pp = p0 + (hash12(cc + seed) - 0.5) * A * 2.4 * p0 * (1.0 - p0);
     col = pp > m ? uPal[1] : uPal[0];
+    if (uSort > 0.5) {
+      // Sort: dentro de cada tramo de 8 celdas de una fila, los puntos se ordenan hacia la izquierda.
+      // La densidad se conserva (sigue siendo el dato) pero se lee como un patrón de barras.
+      float bx = floor(cc.x / 8.0) * 8.0;
+      float sum = 0.0;
+      for (int k = 0; k < 8; k++) {
+        vec3 ck = baseAt((vec2(bx + float(k), cc.y) + 0.5) * cell / uRes);
+        sum += clamp(dot(ck - uPal[0], ab) / max(dot(ab, ab), 1e-4), 0.0, 1.0);
+      }
+      col = (cc.x - bx + 0.5) / 8.0 < sum / 8.0 ? uPal[1] : uPal[0];
+    }
   } else {
     // Lines: trama de líneas con ondulación, tipo grabado.
     float P = (4.0 + uGrain * 0.3) * uResScale;
@@ -409,8 +421,7 @@ void main() {
     float n = fbm(suv * asp * 3.0 + 7.1);
     rev = smoothstep(n - 0.12, n + 0.12, uProgress * 1.24 - 0.12);
   } else {
-    rev = smoothstep(uProgress - 0.02, uProgress + 0.02, 1.0 - suv.x) ;
-    rev = 1.0 - rev;
+    rev = 1.0 - smoothstep(uProgress - 0.02, uProgress + 0.02, suv.x);
   }
   float d;
   if (uFill < 0.5) d = f * rev;

@@ -25,7 +25,7 @@ export const easeOutBack = (x: number, k = 1.4) => {
 export const FILLS = ['glyph', 'field', 'both'];
 
 export function baseFrame(over: Partial<ModeFrame> = {}): ModeFrame {
-  return { progress: 1, fill: 0, photo: 0, reveal: 0, gain: 1, knife: null, paper: 0, ...over };
+  return { progress: 1, fill: 0, photo: 0, reveal: 0, gain: 1, knife: null, paper: 0, sort: false, ...over };
 }
 
 export function clear(c: CanvasRenderingContext2D): void {

@@ -78,6 +78,8 @@ export interface ModeFrame {
   knife: { angle: number; phase: number; soft: number } | null;
   /** Densidad de motas de papel en el campo vacío (0..1). */
   paper: number;
+  /** Stipple ordenado en tramos (gesto Detail). */
+  sort: boolean;
 }
 
 export interface Stamp {
@@ -412,6 +414,7 @@ export class Renderer {
       gl.uniform1f(u.uMatrix, p.matrix);
       gl.uniform1f(u.uStrict, p.strict ? 1 : 0);
       gl.uniform1f(u.uPaperSpeck, p.mode?.paper ?? 0);
+      gl.uniform1f(u.uSort, p.mode?.sort ? 1 : 0);
       const knife = p.mode?.knife;
       if (knife) {
         const a = (knife.angle * Math.PI) / 180;
