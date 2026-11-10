@@ -540,3 +540,80 @@ textarea:focus {
     display: none;
   }
 }
+
+/* --- Modes */
+.select {
+  width: 100%;
+  height: 32px;
+  background: #0f0f10;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 8px;
+  font: inherit;
+}
+.select:focus-visible,
+.text-input:focus-visible {
+  outline: 1px solid #4a4a50;
+}
+.mode-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.chip {
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 99px;
+  padding: 2px 8px;
+  border: 1px solid #3a3a40;
+  color: var(--muted);
+}
+.chip.aprobada {
+  color: var(--text);
+  border-color: #5a5a62;
+}
+.chip.propuesta {
+  border-style: dashed;
+}
+.flags {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.toggle input {
+  accent-color: var(--text);
+  margin: 0;
+}
+.flag em {
+  font-style: normal;
+  color: #c8a24a;
+}
+.dial-row,
+.text-dial {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.text-input {
+  height: 30px;
+  background: #0f0f10;
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0 8px;
+  font: inherit;
+}
+.error {
+  color: #ff7a7a;
+  font-size: 11px;
+}

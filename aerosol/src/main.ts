@@ -20,6 +20,10 @@ import { clipDuration, sampleTimeline, totalDuration, type Clip } from './timeli
 import { Brush, eventsBetween, type TouchEvt } from './touch';
 import { download, exportVideo } from './export';
 import { el, section, segmented, slider, type Control } from './ui';
+import { BASE_MODE, MODES, dialDefaults, getMode, modesIn } from './modes/registry';
+import { GROUPS, type Dial, type DialValue, type DialValues, type ModeDef } from './modes/types';
+import { buildDials, type DialControl } from './modes/panel';
+import { IMPLS } from './modes/impl';
 
 // ---------------------------------------------------------------- Parámetros
 
@@ -55,6 +59,11 @@ interface Params {
   glow: number;
   hold: number;
   fade: number;
+  /** Modo activo (id del registro) y valores de diales por modo. */
+  mode: string;
+  dials: Record<string, DialValues>;
+  /** Flags "fuera de pares locked" prendidos, por modo. */
+  flags: Record<string, string[]>;
 }
 
 const DEFAULTS: Params = {
@@ -85,6 +94,9 @@ const DEFAULTS: Params = {
   glow: 0,
   hold: 2.2,
   fade: 1.2,
+  mode: BASE_MODE,
+  dials: {},
+  flags: {},
 };
 
 const STORE_KEY = 'aerosol:params:v1';
@@ -96,6 +108,7 @@ function loadParams(): Params {
       const p = { ...structuredClone(DEFAULTS), ...JSON.parse(raw) } as Params;
       if (!(p.frame in FRAMES)) p.frame = DEFAULTS.frame;
       if (!STYLES.includes(p.style)) p.style = DEFAULTS.style;
+      if (!MODES.some((m) => m.id === p.mode)) p.mode = BASE_MODE;
       return p;
     }
   } catch {
@@ -151,6 +164,31 @@ function frameSize(): [number, number] {
   const [rw, rh] = FRAMES[params.frame];
   const even = (x: number) => Math.round(x / 2) * 2;
   return rw >= rh ? [even((short * rw) / rh), short] : [short, even((short * rh) / rw)];
+}
+
+function mode(): ModeDef {
+  return getMode(params.mode);
+}
+
+function isBase(): boolean {
+  return mode().group === 'Base';
+}
+
+function modeValues(m: ModeDef = mode()): DialValues {
+  const own = (params.dials[m.id] ??= {});
+  const out: DialValues = { ...dialDefaults(m.dials) };
+  for (const d of m.dials) out[d.id] = d.bind ? (params as unknown as Record<string, DialValue>)[d.bind] : (own[d.id] ?? d.default);
+  return out;
+}
+
+function flagOn(id: string): boolean {
+  return (params.flags[params.mode] ?? []).includes(id);
+}
+
+/** Largo del loop: la línea de tiempo de media en Base, el loop del modo en los demás. */
+function loopLength(): number {
+  if (isBase()) return totalDuration(clips());
+  return IMPLS[params.mode]?.duration(modeValues()) ?? 2;
 }
 
 function clips(): Clip[] {
@@ -382,7 +420,7 @@ function loop(now: number): void {
     fpsAcc = 0;
     fpsN = 0;
   }
-  const total = totalDuration(clips());
+  const total = loopLength();
   boilClock += dt;
   if (playing && total > 0) {
     const prev = time;
@@ -430,7 +468,7 @@ function updateTransport(total: number): void {
 playBtn.addEventListener('click', () => setPlaying(!playing));
 scrub.addEventListener('input', () => {
   scrubbing = true;
-  time = Number(scrub.value) * totalDuration(clips());
+  time = Number(scrub.value) * loopLength();
 });
 scrub.addEventListener('change', () => (scrubbing = false));
 window.addEventListener('keydown', (e) => {
@@ -469,7 +507,7 @@ const recordBtn = document.querySelector<HTMLButtonElement>('#record')!;
 const recBadge = document.querySelector<HTMLElement>('#rec-badge')!;
 
 function startRecording(): void {
-  if (media.length === 0) return;
+  if (isBase() && media.length === 0) return;
   recording = true;
   events = [];
   time = 0;
@@ -488,7 +526,7 @@ function stopRecording(): void {
   // Cierra un gesto que haya quedado abierto al final del loop.
   if (events.length && events[events.length - 1].type !== 'up') {
     const l = events[events.length - 1];
-    events.push({ ...l, type: 'up', t: Math.min(l.t + 1e-3, totalDuration(clips()) - 1e-3) });
+    events.push({ ...l, type: 'up', t: Math.min(l.t + 1e-3, loopLength() - 1e-3) });
   }
   recordBtn.textContent = 'Record with touch';
   recordBtn.classList.remove('recording');
@@ -513,10 +551,10 @@ cancelBtn.addEventListener('click', () => {
 });
 
 async function runExport(): Promise<void> {
-  if (exporting || media.length === 0) return;
+  if (exporting || (isBase() && media.length === 0)) return;
   stopRecording();
   const list = clips();
-  const total = totalDuration(list);
+  const total = loopLength();
   const fps = 30;
   const frames = Math.max(1, Math.round(total * fps));
   const [w, h] = frameSize();
@@ -568,7 +606,7 @@ async function runExport(): Promise<void> {
       },
     });
     progressText.textContent = 'Saving…';
-    await download(res.blob, `aerosol-${params.frame.replace(':', 'x')}-${params.res}.${res.ext}`);
+    await download(res.blob, `aerosol-${params.mode}-${params.frame.replace(':', 'x')}-${params.res}.${res.ext}`);
   } catch (e) {
     if (!(e instanceof DOMException && e.name === 'AbortError')) {
       console.error(e);
@@ -597,7 +635,13 @@ const left = document.querySelector<HTMLElement>('#left')!;
 const right = document.querySelector<HTMLElement>('#right')!;
 const fileInput = document.querySelector<HTMLInputElement>('#file')!;
 
+const dialsBody = section(left, 'Dials');
+const dialsRoot = dialsBody.parentElement!;
+const dialsHead = dialsRoot.querySelector('.hint')!;
+let dialControls: DialControl[] = [];
+
 const mediaBody = section(left, 'Media', 'plays top to bottom');
+const mediaRoot = mediaBody.parentElement!;
 const mediaList = el('div', { class: 'media-list' });
 const addBtn = el('button', { class: 'add', type: 'button' }, '+ Add photos or videos');
 addBtn.addEventListener('click', () => fileInput.click());
@@ -692,6 +736,7 @@ window.addEventListener('drop', (e) => {
 
 // Texto
 const textBody = section(left, 'Text');
+const textRoot = textBody.parentElement!;
 const textarea = el('textarea', { placeholder: 'Type a headline…', rows: '3', spellcheck: 'false' });
 textarea.value = params.text;
 textarea.addEventListener('input', () => {
@@ -705,6 +750,7 @@ type NumKey = { [K in keyof Params]: Params[K] extends number ? K : never }[keyo
 function numSlider(parent: HTMLElement, key: NumKey, label: string, min: number, max: number, step: number, digits?: number, suffix?: string, after?: () => void) {
   controls[key] = slider(parent, { label, min, max, step, value: DEFAULTS[key], digits, suffix }, (v) => {
     params[key] = v;
+    for (const c of dialControls) if (c.dial.bind === key) c.set(v);
     after?.();
     save();
   });
@@ -746,6 +792,130 @@ function renderTouchStatus(): void {
 }
 
 // ---------------------------------------------------------------- Panel derecho
+
+// Modo: selector agrupado (Base, Figma Q3, Moodboard), status, flags y presets.
+const modeBody = section(right, 'Mode');
+const modeSelect = el('select', { id: 'mode-select', class: 'select', 'aria-label': 'Mode' });
+for (const g of GROUPS) {
+  const list = modesIn(g);
+  const og = el('optgroup', { label: list.length ? g : `${g} (sin modos en este repo)` });
+  if (!list.length) og.setAttribute('disabled', '');
+  for (const m of list) og.append(el('option', { value: m.id }, m.label));
+  if (!list.length) og.append(el('option', { value: '', disabled: '' }, '—'));
+  modeSelect.append(og);
+}
+const modeMeta = el('div', { class: 'mode-meta' });
+const flagsBox = el('div', { class: 'flags' });
+const presetSave = el('button', { class: 'link', type: 'button' }, 'Save preset');
+const presetLoad = el('button', { class: 'link', type: 'button' }, 'Load preset');
+const presetInput = el('input', { type: 'file', accept: 'application/json,.json', hidden: '' });
+modeBody.append(modeSelect, modeMeta, flagsBox, el('div', { class: 'link-row' }, el('span', {}, presetSave, ' · ', presetLoad), presetInput));
+modeSelect.addEventListener('change', () => applyMode(modeSelect.value, true));
+
+function setDial(d: Dial, v: DialValue): void {
+  if (d.bind) {
+    (params as unknown as Record<string, DialValue>)[d.bind] = v;
+    controls[d.bind]?.set(Number(v));
+  } else {
+    (params.dials[params.mode] ??= {})[d.id] = v;
+  }
+  save();
+}
+
+function renderModeMeta(): void {
+  const m = mode();
+  modeSelect.value = m.id;
+  modeMeta.replaceChildren(
+    el('span', { class: `chip ${m.status}` }, m.status === 'aprobada' ? 'Aprobada' : 'Propuesta'),
+    el('span', { class: 'hint' }, m.category),
+  );
+  flagsBox.replaceChildren(
+    ...m.optionalUnlocked.map((f) => {
+      const input = el('input', { type: 'checkbox', id: `flag-${f.id}` });
+      input.checked = flagOn(f.id);
+      input.addEventListener('change', () => {
+        const on = new Set(params.flags[m.id] ?? []);
+        if (input.checked) on.add(f.id);
+        else on.delete(f.id);
+        params.flags[m.id] = [...on];
+        onModeVisualsChanged();
+        save();
+      });
+      return el('label', { class: 'toggle flag', for: `flag-${f.id}` }, input, el('span', {}, f.label, el('em', {}, ' · fuera de pares locked')));
+    }),
+  );
+}
+
+/** Lo que depende del modo y sus flags (paleta, paneles). Crece con los commits siguientes. */
+function onModeVisualsChanged(): void {
+  renderColour();
+}
+
+function applyMode(id: string, fromUser: boolean): void {
+  const m = getMode(id);
+  params.mode = m.id;
+  if (fromUser) {
+    if (m.style && (STYLES as readonly string[]).includes(m.style)) {
+      params.style = m.style as Style;
+      styleSeg.set(params.style);
+    }
+    for (const [k, v] of Object.entries(m.paint ?? {})) {
+      (params as unknown as Record<string, DialValue>)[k] = v;
+      if (typeof v === 'number') controls[k]?.set(v);
+    }
+    time = 0;
+    renderer.resetSmear();
+    brush.reset();
+    events = [];
+    renderTouchStatus();
+  }
+  const base = m.group === 'Base';
+  dialsRoot.hidden = base;
+  mediaRoot.hidden = !base && !m.dials.some((d) => d.id === 'photo');
+  textRoot.hidden = !base;
+  dialsHead.textContent = m.label;
+  dialControls = buildDials(dialsBody, m.dials, { get: (d) => modeValues(m)[d.id], set: setDial });
+  renderModeMeta();
+  onModeVisualsChanged();
+  save();
+}
+
+// Presets: modo + flags + diales (los enlazados incluidos) + texto.
+presetSave.addEventListener('click', () => {
+  const m = mode();
+  const preset = { kind: 'aerosol-preset', version: 1, mode: m.id, flags: params.flags[m.id] ?? [], dials: modeValues(m), text: params.text };
+  download(new Blob([JSON.stringify(preset, null, 2)], { type: 'application/json' }), `aerosol-preset-${m.id}.json`).catch((e) =>
+    console.error(e),
+  );
+});
+presetLoad.addEventListener('click', () => presetInput.click());
+presetInput.addEventListener('change', async () => {
+  const f = presetInput.files?.[0];
+  presetInput.value = '';
+  if (!f) return;
+  try {
+    const p = JSON.parse(await f.text());
+    if (p?.kind !== 'aerosol-preset' || !MODES.some((m) => m.id === p.mode)) throw new Error('not an Aerosol preset');
+    const m = getMode(p.mode);
+    params.flags[m.id] = Array.isArray(p.flags) ? p.flags.filter((x: unknown) => m.optionalUnlocked.some((o) => o.id === x)) : [];
+    for (const d of m.dials) {
+      const v = p.dials?.[d.id];
+      if (v === undefined) continue;
+      if (d.bind) (params as unknown as Record<string, DialValue>)[d.bind] = v;
+      else (params.dials[m.id] ??= {})[d.id] = v;
+      if (d.bind && typeof v === 'number') controls[d.bind]?.set(v);
+    }
+    if (typeof p.text === 'string') {
+      params.text = p.text;
+      textarea.value = p.text;
+      refreshText();
+    }
+    applyMode(m.id, false);
+    time = 0;
+  } catch (e) {
+    modeMeta.append(el('span', { class: 'error' }, `Could not load preset: ${e instanceof Error ? e.message : e}`));
+  }
+});
 
 const frameBody = section(right, 'Frame');
 segmented(frameBody, Object.keys(FRAMES) as FrameKey[], params.frame, (v) => {
@@ -821,7 +991,7 @@ function renderColour(): void {
 }
 
 const paintBody = section(right, 'Paint');
-segmented<Style>(
+const styleSeg = segmented<Style>(
   paintBody,
   [
     { value: 'spray', label: 'Spray' },
@@ -893,6 +1063,7 @@ refreshPhotoPalette();
 renderMedia();
 renderColour();
 renderTouchStatus();
+applyMode(params.mode, false);
 setPlaying(true);
 fitCanvas();
 refreshText();
@@ -904,6 +1075,7 @@ Object.assign(window, {
   __aerosol: {
     params,
     setTime: (t: number) => (time = t),
+    applyMode,
     setPlaying,
     renderNow: () => draw(0),
     refresh: () => {
