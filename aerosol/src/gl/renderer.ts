@@ -1,5 +1,6 @@
 import { BLUR_FRAG, COMP_FRAG, FINAL_FRAG, MODE_COMP_FRAG, SMEAR_FRAG, VERT } from './shaders';
 import type { RGB } from '../palette';
+import { blueNoise } from './bluenoise';
 
 interface Target {
   tex: WebGLTexture;
@@ -14,7 +15,7 @@ interface Program {
   u: Uniforms;
 }
 
-export const STYLES = ['spray', 'halftone', 'riso', 'pixel', 'lines'] as const;
+export const STYLES = ['spray', 'halftone', 'riso', 'pixel', 'lines', 'stipple'] as const;
 export type Style = (typeof STYLES)[number];
 
 export interface SourceRef {
@@ -37,6 +38,9 @@ export interface FrameParams {
   saturation: number;
   pale: number;
   grain: number;
+  /** Stipple: matriz (0 = Bayer 8×8, 1 = blue noise) y tamaño de celda en px a 1080p. */
+  matrix: number;
+  cell: number;
   flatten: number;
   brandMix: number;
   style: Style;
@@ -86,6 +90,7 @@ export class Renderer {
   private pModeComp: Program;
   private figTex: WebGLTexture;
   private crispTex: WebGLTexture;
+  private blueTex: WebGLTexture;
   private pBlur: Program;
   private pFinal: Program;
   private field: [Target, Target] | null = null;
@@ -117,6 +122,12 @@ export class Renderer {
     this.textTex = this.texture();
     this.figTex = this.texture();
     this.crispTex = this.texture();
+    this.blueTex = this.texture();
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 64, 64, 0, gl.RED, gl.UNSIGNED_BYTE, blueNoise(64));
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
     this.blank = this.texture();
     gl.bindTexture(gl.TEXTURE_2D, this.blank);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
@@ -388,6 +399,9 @@ export class Renderer {
       gl.uniform1i(u.uInkN, k);
       if (k > 0) gl.uniform3fv(u.uInks, p.inks.slice(0, k).flat());
       gl.uniform3f(u.uRisoPaper, ...p.risoPaper);
+      this.bind(2, this.blueTex, u.uBlue);
+      gl.uniform1f(u.uMatrix, p.matrix);
+      gl.uniform1f(u.uCell, p.cell);
       gl.uniform3f(u.uGuardA, ...p.guard[0]);
       gl.uniform3f(u.uGuardB, ...p.guard[1]);
       gl.drawArrays(gl.TRIANGLES, 0, 3);

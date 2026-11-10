@@ -52,6 +52,9 @@ interface Params {
   flatten: number;
   airbrush: number;
   grain: number;
+  /** Stipple: matriz de dither y tamaño de celda. */
+  matrix: 'bayer' | 'blue-noise';
+  cell: number;
   saturation: number;
   pale: number;
   boil: number;
@@ -90,6 +93,8 @@ const DEFAULTS: Params = {
   flatten: 7,
   airbrush: 4,
   grain: 22,
+  matrix: 'blue-noise',
+  cell: 2,
   saturation: 1.45,
   pale: 0.3,
   boil: 1,
@@ -466,6 +471,8 @@ function frameParams(t: number, tick: number, a: SourceRef | null, b: SourceRef 
     saturation: params.saturation,
     pale: params.pale,
     grain: params.grain,
+    matrix: params.matrix === 'bayer' ? 0 : 1,
+    cell: params.cell,
     flatten: params.flatten,
     brandMix: lockedPalette() ? 1 : params.brandMix,
     style: params.style,
@@ -962,7 +969,12 @@ modeSelect.addEventListener('change', () => applyMode(modeSelect.value, true));
 function setDial(d: Dial, v: DialValue): void {
   if (d.bind) {
     (params as unknown as Record<string, DialValue>)[d.bind] = v;
-    controls[d.bind]?.set(Number(v));
+    if (typeof v === 'number') controls[d.bind]?.set(v);
+    if (d.bind === 'matrix') matrixSeg.set(v as Params['matrix']);
+    if (d.bind === 'style') {
+      styleSeg.set(v as Style);
+      renderStippleControls();
+    }
   } else {
     (params.dials[params.mode] ??= {})[d.id] = v;
   }
@@ -1021,10 +1033,12 @@ function applyMode(id: string, fromUser: boolean): void {
     if (m.style && (STYLES as readonly string[]).includes(m.style)) {
       params.style = m.style as Style;
       styleSeg.set(params.style);
+      renderStippleControls();
     }
     for (const [k, v] of Object.entries(m.paint ?? {})) {
       (params as unknown as Record<string, DialValue>)[k] = v;
       if (typeof v === 'number') controls[k]?.set(v);
+      if (k === 'matrix') matrixSeg.set(v as Params['matrix']);
     }
     time = 0;
     renderer.resetSmear();
@@ -1196,13 +1210,31 @@ const styleSeg = segmented<Style>(
     { value: 'riso', label: 'Riso' },
     { value: 'pixel', label: 'Pixel' },
     { value: 'lines', label: 'Lines' },
+    { value: 'stipple', label: 'Stipple' },
   ],
   params.style,
   (v) => {
     params.style = v;
+    renderStippleControls();
     save();
   },
 );
+// Stipple (1 bit): matriz y celda. Solo se ven con ese estilo.
+const stippleBox = el('div', { class: 'section-body' });
+paintBody.append(stippleBox);
+const matrixSeg = segmented(stippleBox, [
+  { value: 'bayer', label: 'Bayer' },
+  { value: 'blue-noise', label: 'Blue noise' },
+] as { value: Params['matrix']; label: string }[], params.matrix, (v) => {
+  params.matrix = v;
+  for (const c of dialControls) if (c.dial.bind === 'matrix') c.set(v);
+  save();
+}, 'flat');
+numSlider(stippleBox, 'cell', 'Cell', 1, 12, 1);
+function renderStippleControls(): void {
+  stippleBox.hidden = params.style !== 'stipple';
+}
+renderStippleControls();
 numSlider(paintBody, 'flatten', 'Flatten', 2, 12, 1);
 numSlider(paintBody, 'airbrush', 'Airbrush', 0, 12, 0.05, 2);
 numSlider(paintBody, 'grain', 'Grain', 0, 50, 1);

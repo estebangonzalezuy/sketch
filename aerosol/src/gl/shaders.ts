@@ -173,6 +173,9 @@ uniform int uInkN;
 uniform vec3 uRisoPaper;
 uniform vec3 uGuardA;
 uniform vec3 uGuardB;
+uniform sampler2D uBlue;
+uniform float uMatrix;
+uniform float uCell;
 ${NOISE}
 
 // #0000FF y #3D3DEB están retirados: ningún píxel del preview o del export puede acercarse.
@@ -322,6 +325,19 @@ void main() {
     vec3 c = baseAt((cell + 0.5) * B / uRes);
     vec2 sh = floor(hash32(seed).xy * 8.0) * step(0.5, uTick);
     col = quant(c, vec3(bayer8(cell + sh) - 0.5) * (0.25 + A * 0.9));
+  } else if (uStyle == 5) {
+    // Stipple: dither de 1 bit entre las dos primeras tintas (campo, figura). La densidad de puntos
+    // es el valor: Bayer 8×8 o blue noise 64×64, en celdas de uCell px.
+    float cell = max(1.0, floor(uCell * uResScale + 0.5));
+    vec2 cc = floor(fc / cell);
+    vec3 c = baseAt((cc + 0.5) * cell / uRes);
+    vec2 sh = floor(hash32(seed).xy * 64.0) * step(0.5, uTick);
+    float m = uMatrix < 0.5 ? bayer8(cc + sh) : (texelFetch(uBlue, ivec2(mod(cc + sh, 64.0)), 0).r * 255.0 + 0.5) / 256.0;
+    vec3 ab = uPal[1] - uPal[0];
+    float p0 = clamp(dot(c - uPal[0], ab) / max(dot(ab, ab), 1e-4), 0.0, 1.0);
+    // Grain mueve el umbral solo donde la densidad es parcial: los campos planos quedan limpios.
+    float pp = p0 + (hash12(cc + seed) - 0.5) * A * 2.4 * p0 * (1.0 - p0);
+    col = pp > m ? uPal[1] : uPal[0];
   } else {
     // Lines: trama de líneas con ondulación, tipo grabado.
     float P = (4.0 + uGrain * 0.3) * uResScale;
