@@ -62,5 +62,7 @@ export interface ModeDef {
   paint?: Record<string, number | string>;
   dials: Dial[];
   optionalUnlocked: UnlockedFlag[];
+  /** Vacío mínimo que pide el brief (0..1); el panel lo compara con el del hold. */
+  minEmpty?: number;
   notes?: string;
 }

@@ -391,8 +391,61 @@ function syncVideosLive(a: number, b: number, localA: number, localB: number): v
 
 // ---------------------------------------------------------------- Render
 
+// ---------------------------------------------------------------- Capas de modo
+
+const figCanvas = document.createElement('canvas');
+const crispCanvas = document.createElement('canvas');
+const figCtx = figCanvas.getContext('2d', { willReadFrequently: true })!;
+const crispCtx = crispCanvas.getContext('2d')!;
+let layerKey = '';
+/** Porcentaje de campo vacío de la figura actual (para el panel). */
+let emptyShare = -1;
+
+/** Dibuja y sube las capas del modo si cambiaron. Devuelve el frame del modo, o null en Base. */
+function modeFrame(t: number): FrameParams['mode'] {
+  const impl = IMPLS[params.mode];
+  if (isBase() || !impl) return null;
+  const v = modeValues();
+  const [w, h] = frameSize();
+  const key = `${params.mode}|${w}x${h}|${impl.key(t, v)}`;
+  if (key !== layerKey) {
+    for (const c of [figCanvas, crispCanvas]) {
+      if (c.width !== w || c.height !== h) {
+        c.width = w;
+        c.height = h;
+      }
+    }
+    impl.draw({ fig: figCtx, crisp: crispCtx, w, h }, t, v);
+    renderer.uploadModeLayers(figCanvas, crispCanvas);
+    layerKey = key;
+    measureEmpty(v);
+  }
+  return impl.frame(t, v);
+}
+
+const probe = document.createElement('canvas');
+probe.width = 120;
+probe.height = 120;
+const probeCtx = probe.getContext('2d', { willReadFrequently: true })!;
+function measureEmpty(v: DialValues): void {
+  probeCtx.clearRect(0, 0, 120, 120);
+  probeCtx.drawImage(figCanvas, 0, 0, 120, 120);
+  const fig = probeCtx.getImageData(0, 0, 120, 120).data;
+  probeCtx.drawImage(crispCanvas, 0, 0, 120, 120);
+  const crisp = probeCtx.getImageData(0, 0, 120, 120).data;
+  let filled = 0;
+  const field = v.fill === 'field';
+  for (let i = 0; i < fig.length; i += 4) {
+    const f = fig[i] > 127;
+    if ((field ? !f : f) || crisp[i] > 127) filled++;
+  }
+  emptyShare = 1 - filled / (fig.length / 4);
+  renderEmpty();
+}
+
 function frameParams(t: number, tick: number, a: SourceRef | null, b: SourceRef | null, fade: number): FrameParams {
   const pal = palette();
+  const m = modeFrame(t);
   const ink = inks();
   const colors = activeIdx().map((i) => guardColor(pal.colors[i], ink.figure));
   const riso = risoInks(colors);
@@ -402,8 +455,11 @@ function frameParams(t: number, tick: number, a: SourceRef | null, b: SourceRef 
     fade,
     time: t,
     tick,
-    hasText,
-    textEffect: params.textEffect,
+    hasText: m ? true : hasText,
+    textEffect: m ? 0 : params.textEffect,
+    mode: m,
+    field: ink.field,
+    figure: ink.figure,
     textColor: guardColor(textColor(), ink.figure),
     guard: [ink.field, ink.figure],
     airbrush: params.airbrush,
@@ -425,6 +481,13 @@ function frameParams(t: number, tick: number, a: SourceRef | null, b: SourceRef 
   };
 }
 
+/** Foto para los modos que la usan (dial Photo): la primera media de la lista, quieta. */
+function modePhoto(): SourceRef | null {
+  if (!modeValues().photo) return null;
+  const m = media.find((x) => x.kind === 'image') ?? media[0];
+  return sourceRef(m);
+}
+
 function decayFor(dt: number): number {
   return Math.exp(-params.spring * params.spring * 9 * dt);
 }
@@ -432,12 +495,19 @@ function decayFor(dt: number): number {
 function draw(dt: number): void {
   const [w, h] = frameSize();
   renderer.resize(w, h);
+  const tick = params.boil > 0 ? Math.floor(boilClock * params.boil * 24) : 0;
+  if (!isBase()) {
+    syncVideosLive(-1, -1, 0, 0);
+    renderer.updateSmear(decayFor(dt), brush.take(), params.brush);
+    renderer.render(frameParams(time, tick, modePhoto(), null, 0));
+    currentIndex = -1;
+    return;
+  }
   const s = sampleTimeline(clips(), time, params.fade);
   syncVideosLive(s.a, s.b, s.localA, s.localB);
   const a = sourceRef(media[s.a]);
   const b = s.b >= 0 ? sourceRef(media[s.b]) : null;
   renderer.updateSmear(decayFor(dt), brush.take(), params.brush);
-  const tick = params.boil > 0 ? Math.floor(boilClock * params.boil * 24) : 0;
   renderer.render(frameParams(time, tick, a, b, b ? s.fade : 0));
   currentIndex = s.a;
 }
@@ -619,6 +689,12 @@ async function runExport(): Promise<void> {
   const renderFrame = async (i: number) => {
     const t = i * dt;
     if (i > 0) for (const e of eventsBetween(events, (i - 1) * dt, t, total)) brush.feed(e);
+    if (!isBase()) {
+      renderer.updateSmear(i === 0 ? 1 : decayFor(dt), brush.take(), params.brush);
+      const tick = params.boil > 0 ? Math.floor(t * params.boil * 24) : 0;
+      renderer.render(frameParams(t, tick, modePhoto(), null, 0));
+      return;
+    }
     const s = sampleTimeline(list, t, params.fade);
     for (const [idx, local] of [
       [s.a, s.localA],
@@ -671,6 +747,34 @@ async function runExport(): Promise<void> {
 }
 
 exportBtn.addEventListener('click', runExport);
+
+/**
+ * Still first: guarda el frame del hold (el último del loop) en PNG, a la resolución de export.
+ * En Base guarda el frame actual.
+ */
+async function savePng(): Promise<void> {
+  if (exporting) return;
+  exporting = true;
+  try {
+    const [w, h] = frameSize();
+    renderer.resize(w, h);
+    const t = isBase() ? time : Math.max(0, loopLength() - 1 / 30);
+    const tick = params.boil > 0 ? Math.floor(t * params.boil * 24) : 0;
+    if (isBase()) {
+      draw(0);
+    } else {
+      renderer.updateSmear(1, brush.take(), params.brush);
+      renderer.render(frameParams(t, tick, modePhoto(), null, 0));
+    }
+    const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/png'));
+    if (blob) await download(blob, `aerosol-${params.mode}-hold-${params.frame.replace(':', 'x')}-${params.res}.png`);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    exporting = false;
+  }
+}
+document.querySelector('#png')!.addEventListener('click', savePng);
 
 // ---------------------------------------------------------------- Panel izquierdo
 
@@ -862,7 +966,17 @@ function setDial(d: Dial, v: DialValue): void {
   } else {
     (params.dials[params.mode] ??= {})[d.id] = v;
   }
+  layerKey = '';
   save();
+}
+
+const emptyEl = el('span', { class: 'empty' });
+function renderEmpty(): void {
+  const m = mode();
+  emptyEl.hidden = isBase() || emptyShare < 0;
+  const pct = Math.round(emptyShare * 100);
+  emptyEl.textContent = `Empty field ${pct}%` + (m.minEmpty ? ` · target ≥${Math.round(m.minEmpty * 100)}%` : '');
+  emptyEl.classList.toggle('low', !!m.minEmpty && emptyShare < m.minEmpty);
 }
 
 function renderModeMeta(): void {
@@ -871,7 +985,9 @@ function renderModeMeta(): void {
   modeMeta.replaceChildren(
     el('span', { class: `chip ${m.status}` }, m.status === 'aprobada' ? 'Aprobada' : 'Propuesta'),
     el('span', { class: 'hint' }, m.category),
+    emptyEl,
   );
+  renderEmpty();
   flagsBox.replaceChildren(
     ...m.optionalUnlocked.map((f) => {
       const input = el('input', { type: 'checkbox', id: `flag-${f.id}` });
@@ -917,6 +1033,8 @@ function applyMode(id: string, fromUser: boolean): void {
     renderTouchStatus();
   }
   const base = m.group === 'Base';
+  layerKey = '';
+  emptyShare = -1;
   dialsRoot.hidden = base;
   mediaRoot.hidden = !base && !m.dials.some((d) => d.id === 'photo');
   textRoot.hidden = !base;
@@ -1146,7 +1264,10 @@ applyMode(params.mode, false);
 setPlaying(true);
 fitCanvas();
 refreshText();
-loadBrandFont().then(refreshText);
+loadBrandFont().then(() => {
+  refreshText();
+  layerKey = '';
+});
 requestAnimationFrame(loop);
 
 // Para pruebas automáticas.

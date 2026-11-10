@@ -1,9 +1,26 @@
+import type { ModeFrame } from '../../gl/renderer';
 import type { DialValues } from '../types';
+import { unaPalabra } from './una-palabra';
 
-/** Lo que un modo que dibuja su propia figura le aporta al render. Se completa con el primer modo. */
+/** Canvases donde dibuja un modo, a la resolución de export. */
+export interface ModeLayers {
+  /** Densidad de la figura: blanco = tinta de figura, gris = densidad parcial (el dato). */
+  fig: CanvasRenderingContext2D;
+  /** Capa nítida (type chico, trazos de 1 px): no pasa por el airbrush. */
+  crisp: CanvasRenderingContext2D;
+  w: number;
+  h: number;
+}
+
 export interface ModeImpl {
   /** Largo del loop en segundos (intro + Hold). */
   duration(v: DialValues): number;
+  /** Cambia solo cuando hay que volver a dibujar las capas (si no, no se re-suben). */
+  key(t: number, v: DialValues): string;
+  draw(l: ModeLayers, t: number, v: DialValues): void;
+  frame(t: number, v: DialValues): ModeFrame;
 }
 
-export const IMPLS: Record<string, ModeImpl> = {};
+export const IMPLS: Record<string, ModeImpl> = {
+  'una-palabra': unaPalabra,
+};

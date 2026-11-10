@@ -335,3 +335,58 @@ void main() {
   col += rib * 0.05;
   outColor = vec4(guardBlue(clamp(col, 0.0, 1.0)), 1.0);
 }`;
+
+// --- Composición de un modo Moodboard: la figura viene de un canvas 2D (densidad en r) y la capa
+// nítida (type chico, órbitas) de otro. Sale la mezcla de las 2 tintas, más la capa nítida en a.
+export const MODE_COMP_FRAG = /* glsl */ `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 outColor;
+uniform sampler2D uFig;
+uniform sampler2D uCrisp;
+uniform sampler2D uField;
+uniform sampler2D uA;
+uniform vec2 uCoverA;
+uniform float uHasA;
+uniform vec3 uBg;
+uniform vec3 uFg;
+uniform float uProgress;
+uniform float uFill;
+uniform float uPhoto;
+uniform float uReveal;
+uniform float uTime;
+uniform float uAspect;
+uniform float uWave;
+${NOISE}
+void main() {
+  vec2 uv = vUv;
+  vec2 asp = vec2(uAspect, 1.0);
+  if (uWave > 0.0) {
+    vec2 q = uv * asp * 2.2;
+    vec2 w = vec2(fbm(q + vec2(0.0, uTime * 0.13)), fbm(q + vec2(5.2, 1.3) - uTime * 0.11)) - 0.5;
+    uv += w * uWave * 0.32;
+  }
+  vec2 suv = uv - texture(uField, uv).xy;
+  float f = texture(uFig, suv).r;
+  // Revelado: por manchas de spray (cada zona se llena cuando el avance pasa su umbral de ruido)
+  // o por un barrido de izquierda a derecha.
+  float rev;
+  if (uReveal < 0.5) {
+    float n = fbm(suv * asp * 3.0 + 7.1);
+    rev = smoothstep(n - 0.12, n + 0.12, uProgress * 1.24 - 0.12);
+  } else {
+    rev = smoothstep(uProgress - 0.02, uProgress + 0.02, 1.0 - suv.x) ;
+    rev = 1.0 - rev;
+  }
+  float d;
+  if (uFill < 0.5) d = f * rev;
+  else if (uFill < 1.5) d = (1.0 - f) * rev;
+  else d = max(f, (1.0 - f) * 0.3) * rev;
+  if (uHasA > 0.5 && uPhoto > 0.0) {
+    vec3 ph = texture(uA, clamp((suv - 0.5) * uCoverA + 0.5, 0.0, 1.0)).rgb;
+    float l = dot(ph, vec3(0.2126, 0.7152, 0.0722));
+    d = max(d, (1.0 - l) * uPhoto * rev);
+  }
+  outColor = vec4(mix(uBg, uFg, clamp(d, 0.0, 1.0)), texture(uCrisp, suv).r);
+}`;
+

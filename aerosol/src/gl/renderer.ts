@@ -1,4 +1,4 @@
-import { BLUR_FRAG, COMP_FRAG, FINAL_FRAG, SMEAR_FRAG, VERT } from './shaders';
+import { BLUR_FRAG, COMP_FRAG, FINAL_FRAG, MODE_COMP_FRAG, SMEAR_FRAG, VERT } from './shaders';
 import type { RGB } from '../palette';
 
 interface Target {
@@ -45,10 +45,27 @@ export interface FrameParams {
   paletteLab: RGB[];
   inks: RGB[];
   risoPaper: RGB;
+  /** Modo Moodboard activo, o null en el modo Base (fotos). */
+  mode: ModeFrame | null;
+  /** Tintas campo y figura del par activo (las usa la composición de modos). */
+  field: RGB;
+  figure: RGB;
   wave: number;
   glass: number;
   chroma: number;
   glow: number;
+}
+
+/** Lo que un modo Moodboard le pide al render en este frame. */
+export interface ModeFrame {
+  /** Avance del revelado (0..1). */
+  progress: number;
+  /** 0 = glifo, 1 = campo, 2 = ambos. */
+  fill: number;
+  /** Cuánto de la foto (fuente A) entra como densidad. */
+  photo: number;
+  /** 0 = revelado por manchas de spray, 1 = barrido. */
+  reveal: number;
 }
 
 export interface Stamp {
@@ -66,6 +83,9 @@ export class Renderer {
   private vao: WebGLVertexArrayObject;
   private pSmear: Program;
   private pComp: Program;
+  private pModeComp: Program;
+  private figTex: WebGLTexture;
+  private crispTex: WebGLTexture;
   private pBlur: Program;
   private pFinal: Program;
   private field: [Target, Target] | null = null;
@@ -91,9 +111,12 @@ export class Renderer {
     this.vao = gl.createVertexArray()!;
     this.pSmear = this.program(SMEAR_FRAG);
     this.pComp = this.program(COMP_FRAG);
+    this.pModeComp = this.program(MODE_COMP_FRAG);
     this.pBlur = this.program(BLUR_FRAG);
     this.pFinal = this.program(FINAL_FRAG);
     this.textTex = this.texture();
+    this.figTex = this.texture();
+    this.crispTex = this.texture();
     this.blank = this.texture();
     gl.bindTexture(gl.TEXTURE_2D, this.blank);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
@@ -147,6 +170,12 @@ export class Renderer {
 
   uploadText(src: TexImageSource): void {
     this.upload(this.textTex, src);
+  }
+
+  /** Capas de un modo: figura (densidad) y capa nítida. */
+  uploadModeLayers(fig: TexImageSource, crisp: TexImageSource): void {
+    this.upload(this.figTex, fig);
+    this.upload(this.crispTex, crisp);
   }
 
   deleteTexture(tex: WebGLTexture): void {
@@ -258,8 +287,31 @@ export class Renderer {
     const scale = Math.min(this.width, this.height) / 1080;
     gl.bindVertexArray(this.vao);
 
-    // 1. Composición
-    {
+    // 1. Composición (modo Moodboard)
+    if (p.mode) {
+      const { prog, u } = this.pModeComp;
+      gl.useProgram(prog);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.comp.fbo);
+      gl.viewport(0, 0, this.comp.w, this.comp.h);
+      this.bind(0, this.figTex, u.uFig);
+      this.bind(1, this.crispTex, u.uCrisp);
+      this.bind(2, this.field ? this.field[0].tex : this.blank, u.uField);
+      this.bind(3, p.a?.tex ?? this.blank, u.uA);
+      gl.uniform2f(u.uCoverA, ...this.coverScale(p.a?.aspect ?? 1));
+      gl.uniform1f(u.uHasA, p.a ? 1 : 0);
+      gl.uniform3f(u.uBg, ...p.field);
+      gl.uniform3f(u.uFg, ...p.figure);
+      gl.uniform1f(u.uProgress, p.mode.progress);
+      gl.uniform1f(u.uFill, p.mode.fill);
+      gl.uniform1f(u.uPhoto, p.mode.photo);
+      gl.uniform1f(u.uReveal, p.mode.reveal);
+      gl.uniform1f(u.uTime, p.time);
+      gl.uniform1f(u.uAspect, this.width / this.height);
+      gl.uniform1f(u.uWave, p.wave);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+    // 1. Composición (fotos)
+    else {
       const { prog, u } = this.pComp;
       gl.useProgram(prog);
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.comp.fbo);
