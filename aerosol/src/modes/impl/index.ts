@@ -5,6 +5,7 @@ import { datoGrande } from './dato-grande';
 import { cruce } from './cruce';
 import { campoPartido } from './campo-partido';
 import { granoPapel } from './grano-papel';
+import { orbita } from './orbita';
 
 /** Canvases donde dibuja un modo, a la resolución de export. */
 export interface ModeLayers {
@@ -31,4 +32,5 @@ export const IMPLS: Record<string, ModeImpl> = {
   cruce,
   'campo-partido': campoPartido,
   'grano-papel': granoPapel,
+  orbita,
 };
