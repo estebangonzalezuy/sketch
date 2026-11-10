@@ -1,6 +1,6 @@
 /** Todo type sobre el canvas va en Archivo Narrow (variable 400–700). */
 export const BRAND_FONT = 'Archivo Narrow Canvas';
-const BRAND_FONT_URL = 'fonts/archivo-narrow-latin-wght-normal.woff2';
+const BRAND_FONT_URL = `${import.meta.env.BASE_URL}fonts/archivo-narrow-latin-wght-normal.woff2`;
 
 /** Carga la fuente de marca desde public/fonts. Si falla, el texto usa una sans del sistema. */
 export async function loadBrandFont(): Promise<boolean> {

@@ -1,6 +1,6 @@
 import { useSyncExternalStore, type AnchorHTMLAttributes, type MouseEvent } from 'react';
 
-/** A deliberately tiny history router: 4 routes don't need a library. */
+/** A deliberately tiny history router: 4 routes don't need a library. Paths are relative to Vite's base. */
 
 type Saved = { y: number; count?: number };
 const saved = new Map<string, Saved>();
@@ -27,6 +27,15 @@ if (typeof history !== 'undefined') {
   });
 }
 
+/** Vite's base without the trailing slash ('' at the root). App paths stay '/', '/cities', '/s/…'. */
+export const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+/** App path → real URL path. */
+export const withBase = (to: string) =>
+  to === '/' ? BASE || '/' : to.startsWith('/') ? BASE + to : to;
+/** Real URL path → app path. */
+export const stripBase = (path: string) =>
+  BASE && path.startsWith(BASE) ? path.slice(BASE.length) || '/' : path;
+
 function newKey() {
   return Math.random().toString(36).slice(2, 10);
 }
@@ -50,10 +59,10 @@ export function savedForCurrentEntry(): Saved | undefined {
 
 export function navigate(to: string, opts: { replace?: boolean } = {}) {
   if (opts.replace) {
-    history.replaceState({ key: currentKey() }, '', to);
+    history.replaceState({ key: currentKey() }, '', withBase(to));
   } else {
     rememberScroll();
-    history.pushState({ key: newKey() }, '', to);
+    history.pushState({ key: newKey() }, '', withBase(to));
   }
   emit();
 }
@@ -62,7 +71,7 @@ function subscribe(fn: () => void) {
   listeners.add(fn);
   return () => listeners.delete(fn);
 }
-const snapshot = () => location.pathname + location.search;
+const snapshot = () => stripBase(location.pathname) + location.search;
 
 export function useLocation() {
   const href = useSyncExternalStore(subscribe, snapshot, () => '/');
@@ -88,5 +97,5 @@ export function Link({ to, onClick, ...rest }: LinkProps) {
     e.preventDefault();
     navigate(to);
   };
-  return <a href={to} onClick={handle} {...rest} />;
+  return <a href={withBase(to)} onClick={handle} {...rest} />;
 }
