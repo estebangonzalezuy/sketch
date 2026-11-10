@@ -1,0 +1,26 @@
+{
+  "id": "campo-partido",
+  "label": "D · Campo Partido",
+  "group": "Moodboard",
+  "order": 4,
+  "category": "Color fields",
+  "status": "aprobada",
+  "defaultPair": "magenta-verde",
+  "style": "spray",
+  "paint": { "airbrush": 1.2, "boil": 0.6, "saturation": 1, "pale": 0, "wave": 0, "glass": 0, "chroma": 0, "glow": 0 },
+  "dials": [
+    { "id": "angle", "label": "Angle", "type": "range", "min": -90, "max": 90, "step": 1, "default": 0, "suffix": "°" },
+    { "id": "phase", "label": "Phase", "type": "range", "min": 0, "max": 1, "step": 0.01, "default": 0.5, "digits": 2 },
+    { "id": "speed", "label": "Speed", "type": "range", "min": 0.3, "max": 3, "step": 0.05, "default": 1, "digits": 2 },
+    { "id": "softness", "label": "Softness", "type": "range", "min": 0, "max": 1, "step": 0.01, "default": 0, "digits": 2 },
+    { "id": "typeOn", "label": "Type", "type": "toggle", "default": true },
+    { "id": "text", "label": "Type text", "type": "text", "default": "MOTION" },
+    { "id": "grain", "label": "Grain", "type": "range", "min": 0, "max": 50, "step": 1, "default": 22, "bind": "grain" },
+    { "id": "hold", "label": "Hold", "type": "range", "min": 0.3, "max": 6, "step": 0.1, "default": 1, "digits": 1, "suffix": "s" }
+  ],
+  "optionalUnlocked": [
+    { "id": "orange-cream", "label": "Naranja / crema #FC540C + #FCFCE4", "pair": { "field": "#FCFCE4", "figure": "#FC540C" } },
+    { "id": "gold-black", "label": "Gold / black #FCB400 + #0C0C0C", "pair": { "field": "#FCB400", "figure": "#0C0C0C" } }
+  ],
+  "notes": "Sin degradé en el default. El degradé lima→cian del Q3 no se implementa: sumaría un tercer color."
+}
