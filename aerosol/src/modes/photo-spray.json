@@ -1,0 +1,11 @@
+{
+  "id": "photo-spray",
+  "label": "Photo spray",
+  "group": "Base",
+  "category": "Aerosol",
+  "status": "aprobada",
+  "defaultPair": null,
+  "dials": [],
+  "optionalUnlocked": [{ "id": "full-palette", "label": "Paleta completa y colores de la foto" }],
+  "notes": "La tool base: media, morph, texto, smear. Usa los paneles de siempre."
+}

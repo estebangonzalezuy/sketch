@@ -1,0 +1,27 @@
+{
+  "id": "grano-papel",
+  "label": "E · Grano de Papel",
+  "group": "Moodboard",
+  "order": 5,
+  "category": "tMSC look + Manifesto",
+  "status": "aprobada",
+  "defaultPair": "ink-white",
+  "style": "spray",
+  "minEmpty": 0.7,
+  "paint": { "airbrush": 0.6, "grain": 14, "boil": 0.3, "saturation": 1, "pale": 0, "wave": 0, "glass": 0, "chroma": 0, "glow": 0 },
+  "dials": [
+    { "id": "text", "label": "Text", "type": "text", "multiline": true, "default": "Motion isn't\ndecoration.\nIt's how things\nexplain themselves." },
+    { "id": "size", "label": "Size", "type": "range", "min": 0.03, "max": 0.16, "step": 0.002, "default": 0.082, "digits": 3 },
+    { "id": "grain", "label": "Grain", "type": "range", "min": 0, "max": 50, "step": 1, "default": 14, "bind": "grain" },
+    { "id": "density", "label": "Density (paper)", "type": "range", "min": 0, "max": 0.06, "step": 0.001, "default": 0.012, "digits": 3 },
+    { "id": "airbrush", "label": "Airbrush", "type": "range", "min": 0, "max": 12, "step": 0.05, "default": 0.6, "digits": 2, "bind": "airbrush" },
+    { "id": "grid", "label": "Grid", "type": "toggle", "default": true },
+    { "id": "photo", "label": "Photo (first image in Media)", "type": "toggle", "default": false },
+    { "id": "hold", "label": "Hold", "type": "range", "min": 1.2, "max": 8, "step": 0.1, "default": 1.8, "digits": 1, "suffix": "s" },
+    { "id": "pale", "label": "Pale ground", "type": "range", "min": 0, "max": 1, "step": 0.01, "default": 0, "digits": 2, "bind": "pale" }
+  ],
+  "optionalUnlocked": [
+    { "id": "cream-paper", "label": "Papel crema #F2EEE6 + ink #111111", "pair": { "field": "#F2EEE6", "figure": "#111111" } }
+  ],
+  "notes": "Sin eyebrow naranja ni PLACEHOLDER COPY. La serif y el naranja de los pines no van al default."
+}

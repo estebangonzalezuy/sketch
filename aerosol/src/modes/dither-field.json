@@ -1,0 +1,22 @@
+{
+  "id": "dither-field",
+  "label": "G · Dither Field",
+  "group": "Moodboard",
+  "order": 7,
+  "category": "Hex",
+  "status": "propuesta",
+  "defaultPair": "ink-white",
+  "style": "stipple",
+  "paint": { "airbrush": 0, "grain": 0, "boil": 0, "matrix": "blue-noise", "cell": 3, "saturation": 1, "pale": 0, "wave": 0, "glass": 0, "chroma": 0, "glow": 0 },
+  "dials": [
+    { "id": "matrix", "label": "Matrix", "type": "choice", "options": ["bayer", "blue-noise"], "default": "blue-noise", "bind": "matrix" },
+    { "id": "scale", "label": "Scale (cell px)", "type": "range", "min": 1, "max": 12, "step": 1, "default": 3, "bind": "cell" },
+    { "id": "threshold", "label": "Threshold (word density)", "type": "range", "min": 0.3, "max": 1, "step": 0.01, "default": 0.86, "digits": 2 },
+    { "id": "typeOn", "label": "Type stencil", "type": "toggle", "default": true },
+    { "id": "text", "label": "Text", "type": "text", "default": "SIGNAL" },
+    { "id": "sort", "label": "Sort", "type": "toggle", "default": false },
+    { "id": "hold", "label": "Hold", "type": "range", "min": 0.3, "max": 6, "step": 0.1, "default": 1.2, "digits": 1, "suffix": "s" }
+  ],
+  "optionalUnlocked": [],
+  "notes": "Synaptrix, Cotool (sin su azul), hero HEX, Detail (sort), Unsigned Y. Propuesta: opcional."
+}
