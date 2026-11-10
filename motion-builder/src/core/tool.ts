@@ -3,7 +3,7 @@ import type * as THREE from 'three';
 /** frame: barato, se evalúa cada frame · rebuild: animable, pero reconstruye recursos · none: fijo */
 export type Animate = 'frame' | 'rebuild' | 'none';
 
-type Base = { label?: string; group?: string; animate: Animate };
+type Base = { label?: string; group?: string; animate: Animate; hidden?: boolean }; // hidden: lo escribe el editor, no un control
 
 export type ParamSpec =
   | (Base & {
