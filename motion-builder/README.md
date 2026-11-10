@@ -13,7 +13,13 @@ npm run typecheck
 
 Toda capa tiene zoom y centro animables, además de opacidad y blend.
 
-Tools: Texto, Tag Shader, Text Extruder, ASCII, Chart, Tabla, Contador y Pixelado. Cada una trae presets, que son valores, y templates de animación, que son keyframes editables.
+Entornos: cada proyecto tiene uno, que decide qué tools se pueden agregar (barra superior → Entorno).
+
+- **Inception:** Texto, Tag Shader, Text Extruder, ASCII, Chart, Tabla, Contador y Pixelado.
+- **Spray:** Spray (efecto de foto con morph y texto) y los 7 modos moodboard: Una Palabra, Dato Grande, Cruce, Campo Partido, Grano de Papel, Órbita y Dither Field. Aerógrafo granulado en las 2 tintas de un par tMSC; arrastrar sobre el canvas graba trazos de smear en la capa. Detalle en `docs/spray/README.md`.
+- **Propios:** Entorno → *Armar entorno…* elige tools de cualquiera de los dos. Se guardan en el navegador.
+
+Cada tool trae presets, que son valores, y templates de animación, que son keyframes editables.
 
 Atajos: Espacio reproduce, flechas mueven un frame, Cmd+Z deshace, Cmd+S guarda, S corta el clip en el playhead, Supr borra el key seleccionado, o la capa si no hay key, Alt más arrastrar un key mueve toda la animación de la capa.
 

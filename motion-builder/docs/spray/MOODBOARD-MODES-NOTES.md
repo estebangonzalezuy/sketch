@@ -1,5 +1,7 @@
 # Moodboard modes — notas de implementación
 
+> Histórico. Se escribió cuando el spray era una app aparte en `aerosol/` (ya borrada: vive en el historial de git). Hoy los modos son tools del entorno **Spray** de Motion Builder: ver `README.md` en esta carpeta.
+
 Brief: "spray moodboard modes" (10 nov 2026). Este archivo registra qué encontré en el repo, cómo se engancha el registro de modos y qué entra en cada commit.
 
 ## La tool
