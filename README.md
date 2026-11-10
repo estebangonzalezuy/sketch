@@ -1,3 +1,20 @@
+# Sketches
+
+Colección de sketches. Se sirve en `estebangonzalez.co/sketches` (el proyecto `portfolio` hace un rewrite a este deploy) y no está linkeada desde ningún lado (`noindex`).
+
+| URL                              | Carpeta                                         |
+| -------------------------------- | ----------------------------------------------- |
+| `/sketches`                      | lista, generada por `scripts/build-sketches.ts` |
+| `/sketches/motion-studios-index` | raíz del repo (`src/`)                          |
+| `/sketches/aerosol`              | `aerosol/`                                      |
+| `/sketches/tag-shader`           | `tag-shader/`                                   |
+| `/sketches/inception-ascii`      | `inception-ascii/`                              |
+| `/sketches/motion-builder`       | `motion-builder/`                               |
+
+`npm run build` buildea el Index en `dist/sketches/motion-studios-index/` y después cada sketch con `--base=/sketches/<slug>/`, más la lista. Para sumar un sketch, agregalo a `SKETCHES` en `scripts/build-sketches.ts`. Las rutas a archivos de `public/` desde TS tienen que usar `import.meta.env.BASE_URL`.
+
+---
+
 # Motion Studios Index
 
 A drifting, numbered index of 779 motion design studios worldwide, Nº 001 to Nº 779.
@@ -8,8 +25,8 @@ Static site: Vite, React and TypeScript. There is no server, database or runtime
 
 ```bash
 npm install
-npm run dev        # regenerates the data, then starts Vite
-npm run build      # data → typecheck → bundle → per-page meta HTML in dist/
+npm run dev        # regenerates the data, then starts Vite at /sketches/motion-studios-index/
+npm run build      # the whole collection into dist/sketches/ (build:index for the Index only)
 npm test           # Vitest data checks
 npm run lint
 ```
@@ -45,9 +62,9 @@ Import the repo in Vercel. `vercel.json` sets the build and output, clean URLs, 
 `/assets` and an SPA fallback rewrite.
 
 The post-build script writes `about.html`, `cities.html` and one `s/<slug>.html` per studio, each with
-its own title, description and Open Graph tags, so shared links preview correctly. For absolute
-`og:image` and canonical URLs, plus `sitemap.xml`, set `SITE_URL` (for example
-`https://studios.example.com`). On Vercel, `VERCEL_PROJECT_PRODUCTION_URL` is used automatically.
+its own title, description and Open Graph tags, so shared links preview correctly. Absolute
+`og:image` and canonical URLs, plus `sitemap.xml`, use `SITE_URL` (default `https://estebangonzalez.co`)
+plus the base `/sketches/motion-studios-index`.
 
 ## How it works
 

@@ -6,8 +6,8 @@ import type { Params } from '../../core/tool';
 
 /** Fuentes para extruir: TTF locales. KMR Apparat es comercial y no está en git. */
 export const FAMILIES: Record<string, { file: (w: string) => string; weights: readonly string[]; fallback: string }> = {
-  'KMR Apparat': { file: (w) => `/fonts/kmr-apparat/KMR-Apparat-${w}.ttf`, weights: ['Light', 'Book', 'Regular', 'Medium', 'Bold', 'Heavy', 'Black'], fallback: 'Book' },
-  'Geist Mono': { file: (w) => `/fonts/static/GeistMono-${w}.ttf`, weights: ['Thin', 'UltraLight', 'Light', 'Regular', 'Medium', 'SemiBold', 'Bold', 'Black', 'UltraBlack'], fallback: 'Bold' },
+  'KMR Apparat': { file: (w) => `${import.meta.env.BASE_URL}fonts/kmr-apparat/KMR-Apparat-${w}.ttf`, weights: ['Light', 'Book', 'Regular', 'Medium', 'Bold', 'Heavy', 'Black'], fallback: 'Book' },
+  'Geist Mono': { file: (w) => `${import.meta.env.BASE_URL}fonts/static/GeistMono-${w}.ttf`, weights: ['Thin', 'UltraLight', 'Light', 'Regular', 'Medium', 'SemiBold', 'Bold', 'Black', 'UltraBlack'], fallback: 'Bold' },
 };
 
 export type Look = 'clay' | 'plastic' | 'glossy' | 'chrome' | 'gold' | 'brushed' | 'glass' | 'neon' | 'ink';
