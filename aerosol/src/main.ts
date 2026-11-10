@@ -506,7 +506,11 @@ const progressBar = document.querySelector<HTMLElement>('#progress-bar')!;
 const exportBtn = document.querySelector<HTMLButtonElement>('#export')!;
 let abort: AbortController | null = null;
 
-document.querySelector('#cancel')!.addEventListener('click', () => abort?.abort());
+const cancelBtn = document.querySelector<HTMLButtonElement>('#cancel')!;
+cancelBtn.addEventListener('click', () => {
+  if (exporting) abort?.abort();
+  else overlay.hidden = true;
+});
 
 async function runExport(): Promise<void> {
   if (exporting || media.length === 0) return;
@@ -528,6 +532,8 @@ async function runExport(): Promise<void> {
   renderer.resetSmear();
   brush.reset();
   const dt = 1 / fps;
+  let failed = '';
+  cancelBtn.textContent = 'Cancel';
 
   const renderFrame = async (i: number) => {
     const t = i * dt;
@@ -561,14 +567,20 @@ async function runExport(): Promise<void> {
         progressBar.style.width = `${(d / n) * 100}%`;
       },
     });
-    download(res.blob, `aerosol-${params.frame.replace(':', 'x')}-${params.res}.${res.ext}`);
+    progressText.textContent = 'Saving…';
+    await download(res.blob, `aerosol-${params.frame.replace(':', 'x')}-${params.res}.${res.ext}`);
   } catch (e) {
     if (!(e instanceof DOMException && e.name === 'AbortError')) {
       console.error(e);
-      alert(`Export failed: ${e instanceof Error ? e.message : e}`);
+      failed = `Export failed: ${e instanceof Error ? e.message : e}`;
     }
   } finally {
-    overlay.hidden = true;
+    // Si falló, el diálogo queda abierto con el error y el botón pasa a "Close".
+    overlay.hidden = !failed;
+    if (failed) {
+      progressText.textContent = failed;
+      cancelBtn.textContent = 'Close';
+    }
     exporting = false;
     renderer.resetSmear();
     brush.reset();

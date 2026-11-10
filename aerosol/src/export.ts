@@ -106,7 +106,30 @@ async function recordWebm(job: ExportJob, bitrate: number): Promise<ExportResult
   return { blob: new Blob(chunks, { type: 'video/webm' }), ext: 'webm' };
 }
 
-export function download(blob: Blob, name: string): void {
+interface ClaudeDownloads {
+  save(req: { filename: string; data: Blob }): Promise<unknown>;
+}
+interface ClaudeHost {
+  use(name: 'downloads'): Promise<ClaudeDownloads | null>;
+}
+
+/**
+ * Guarda el archivo. Dentro de un Artifact de claude.ai las descargas directas están bloqueadas,
+ * así que se usa la capacidad `downloads` (el visitante confirma el guardado). Afuera, un <a download>.
+ */
+export async function download(blob: Blob, name: string): Promise<void> {
+  const host = (window as unknown as { claude?: ClaudeHost }).claude;
+  const downloads = host?.use ? await host.use('downloads').catch(() => null) : null;
+  if (downloads) {
+    try {
+      await downloads.save({ filename: name, data: blob });
+    } catch (e) {
+      const code = (e as { code?: string })?.code;
+      if (code === 'declined') return;
+      throw new Error(`Could not save the file (${code ?? 'unknown error'}).`);
+    }
+    return;
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
