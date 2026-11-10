@@ -6,6 +6,7 @@ import { AboutPage } from './pages/AboutPage';
 import { CitiesPage } from './pages/CitiesPage';
 import { IndexPage } from './pages/IndexPage';
 import { NotFound } from './pages/NotFound';
+import { SketchesPage } from './pages/SketchesPage';
 import { StudioPage } from './pages/StudioPage';
 
 function route(pathname: string) {
@@ -13,6 +14,7 @@ function route(pathname: string) {
   if (path === '/') return <IndexPage />;
   if (path === '/cities') return <CitiesPage />;
   if (path === '/about') return <AboutPage />;
+  if (path === '/sketches') return <SketchesPage />;
   const m = path.match(/^\/s\/([^/]+)$/);
   if (m) {
     const s = bySlug.get(decodeURIComponent(m[1]));

@@ -906,6 +906,9 @@ kbd {
   font-family: var(--sans);
   font-size: 0.7em;
 }
+.prose .small code {
+  font-size: inherit;
+}
 .lead {
   font-size: clamp(26px, 3vw, 34px) !important;
   line-height: 1.22 !important;
