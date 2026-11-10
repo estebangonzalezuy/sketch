@@ -463,6 +463,7 @@ function frameParams(t: number, tick: number, a: SourceRef | null, b: SourceRef 
     hasText: m ? true : hasText,
     textEffect: m ? 0 : params.textEffect,
     mode: m,
+    strict: lockedPalette(),
     field: ink.field,
     figure: ink.figure,
     textColor: guardColor(textColor(), ink.figure),

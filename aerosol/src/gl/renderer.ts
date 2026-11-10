@@ -49,6 +49,8 @@ export interface FrameParams {
   paletteLab: RGB[];
   inks: RGB[];
   risoPaper: RGB;
+  /** Paleta de 2 tintas locked: nada puede sumar colores intermedios. */
+  strict: boolean;
   /** Modo Moodboard activo, o null en el modo Base (fotos). */
   mode: ModeFrame | null;
   /** Tintas campo y figura del par activo (las usa la composición de modos). */
@@ -70,6 +72,12 @@ export interface ModeFrame {
   photo: number;
   /** 0 = revelado por manchas de spray, 1 = barrido. */
   reveal: number;
+  /** Multiplica la densidad de la figura (revelado por umbral). */
+  gain: number;
+  /** Cuchilla: ángulo de la línea en grados (0 = horizontal), fase 0..1 y softness. */
+  knife: { angle: number; phase: number; soft: number } | null;
+  /** Densidad de motas de papel en el campo vacío (0..1). */
+  paper: number;
 }
 
 export interface Stamp {
@@ -316,6 +324,7 @@ export class Renderer {
       gl.uniform1f(u.uFill, p.mode.fill);
       gl.uniform1f(u.uPhoto, p.mode.photo);
       gl.uniform1f(u.uReveal, p.mode.reveal);
+      gl.uniform1f(u.uGain, p.mode.gain);
       gl.uniform1f(u.uTime, p.time);
       gl.uniform1f(u.uAspect, this.width / this.height);
       gl.uniform1f(u.uWave, p.wave);
@@ -401,6 +410,18 @@ export class Renderer {
       gl.uniform3f(u.uRisoPaper, ...p.risoPaper);
       this.bind(2, this.blueTex, u.uBlue);
       gl.uniform1f(u.uMatrix, p.matrix);
+      gl.uniform1f(u.uStrict, p.strict ? 1 : 0);
+      gl.uniform1f(u.uPaperSpeck, p.mode?.paper ?? 0);
+      const knife = p.mode?.knife;
+      if (knife) {
+        const a = (knife.angle * Math.PI) / 180;
+        const nx = -Math.sin(a);
+        const ny = Math.cos(a);
+        const extent = Math.abs(nx) * (this.width / this.height) + Math.abs(ny);
+        gl.uniform4f(u.uKnife, nx, ny, (knife.phase - 0.5) * extent, knife.soft);
+      } else {
+        gl.uniform4f(u.uKnife, 0, 0, 0, -1);
+      }
       gl.uniform1f(u.uCell, p.cell);
       gl.uniform3f(u.uGuardA, ...p.guard[0]);
       gl.uniform3f(u.uGuardB, ...p.guard[1]);

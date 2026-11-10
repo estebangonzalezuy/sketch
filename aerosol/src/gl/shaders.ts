@@ -162,6 +162,7 @@ uniform float uTick;
 uniform float uChroma;
 uniform float uGlow;
 uniform float uGlass;
+uniform float uStrict;
 uniform int uStyle;
 uniform vec3 uPaper;
 uniform vec3 uTextColor;
@@ -176,6 +177,8 @@ uniform vec3 uGuardB;
 uniform sampler2D uBlue;
 uniform float uMatrix;
 uniform float uCell;
+uniform vec4 uKnife;
+uniform float uPaperSpeck;
 ${NOISE}
 
 // #0000FF y #3D3DEB están retirados: ningún píxel del preview o del export puede acercarse.
@@ -317,7 +320,7 @@ void main() {
       }
       if (best == i + 1) o *= uInks[i] / max(uRisoPaper, vec3(0.05));
     }
-    col = o * (1.0 - 0.06 * hash12(fc * 0.5 + 3.0));
+    col = uStrict > 0.5 ? o : o * (1.0 - 0.06 * hash12(fc * 0.5 + 3.0));
   } else if (uStyle == 3) {
     // Pixel: mosaico y dither ordenado (Bayer 8×8).
     float B = (2.0 + uGrain * 0.3) * uResScale;
@@ -347,8 +350,22 @@ void main() {
     float t = 0.5 + 0.5 * cos(6.28318 * ph);
     col = quant(c, vec3(t - 0.5) * (0.55 + A) + tri(fc + seed).x * A * 0.3);
   }
-  // Brillo y sombra sutiles en los bordes de cada estría.
-  col += rib * 0.05;
+  // Brillo y sombra sutiles en los bordes de cada estría (solo con la paleta completa: con 2
+  // tintas sumaría colores intermedios).
+  if (uStrict < 0.5) col += rib * 0.05;
+  // Grano de papel: motas fijas de la tinta de figura sobre el campo vacío, a densidad baja.
+  if (uPaperSpeck > 0.0 && distance(col, uGuardA) < 0.02) {
+    float cellP = max(1.0, floor(uResScale * 1.5 + 0.5));
+    if (hash12(floor(fc / cellP) + 9.31) < uPaperSpeck) col = uGuardB;
+  }
+  // Cuchilla: un plano (ángulo + fase) evaluado después del blur, así el canto es duro. Del otro
+  // lado figura y fondo se invierten: con 2 tintas, campo + figura − color.
+  if (uKnife.w >= 0.0) {
+    vec2 q = (uv - 0.5) * vec2(uRes.x / uRes.y, 1.0);
+    float sd = dot(q, uKnife.xy) - uKnife.z;
+    sd += (hash12(fc + seed * 3.0) - 0.5) * uKnife.w * 0.12;
+    if (sd > 0.0) col = uGuardA + uGuardB - col;
+  }
   outColor = vec4(guardBlue(clamp(col, 0.0, 1.0)), 1.0);
 }`;
 
@@ -370,6 +387,7 @@ uniform float uProgress;
 uniform float uFill;
 uniform float uPhoto;
 uniform float uReveal;
+uniform float uGain;
 uniform float uTime;
 uniform float uAspect;
 uniform float uWave;
@@ -398,6 +416,7 @@ void main() {
   if (uFill < 0.5) d = f * rev;
   else if (uFill < 1.5) d = (1.0 - f) * rev;
   else d = max(f, (1.0 - f) * 0.3) * rev;
+  d *= uGain;
   if (uHasA > 0.5 && uPhoto > 0.0) {
     vec3 ph = texture(uA, clamp((suv - 0.5) * uCoverA + 0.5, 0.0, 1.0)).rgb;
     float l = dot(ph, vec3(0.2126, 0.7152, 0.0722));

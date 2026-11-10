@@ -2,6 +2,7 @@ import type { ModeFrame } from '../../gl/renderer';
 import type { DialValues } from '../types';
 import { unaPalabra } from './una-palabra';
 import { datoGrande } from './dato-grande';
+import { cruce } from './cruce';
 
 /** Canvases donde dibuja un modo, a la resolución de export. */
 export interface ModeLayers {
@@ -25,4 +26,5 @@ export interface ModeImpl {
 export const IMPLS: Record<string, ModeImpl> = {
   'una-palabra': unaPalabra,
   'dato-grande': datoGrande,
+  cruce,
 };
