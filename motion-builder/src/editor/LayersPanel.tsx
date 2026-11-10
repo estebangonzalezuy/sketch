@@ -1,4 +1,5 @@
 import { templateOf } from '../brand';
+import { DEFAULT_ENVIRONMENT, environmentOf, toolsFor, useEnvironments } from '../environments';
 import type { ToolDefinition } from '../core/tool';
 import { addLayer, addLayerFrom, deleteLayer, moveLayer, updateLayer } from './ops';
 import { useEditor, type EditorStore } from './store';
@@ -7,6 +8,11 @@ export function LayersPanel({ store, tools }: { store: EditorStore; tools: reado
   const layers = useEditor(store, (s) => s.project.layers);
   const selected = useEditor(store, (s) => s.selectedLayerId);
   const template = useEditor(store, (s) => templateOf(s.project));
+  const envId = useEditor(store, (s) => s.project.environmentId ?? DEFAULT_ENVIRONMENT);
+  useEnvironments();
+  const env = environmentOf(envId);
+  // El entorno decide qué se puede agregar; las capas existentes de otras tools siguen andando.
+  const offered = toolsFor(env, tools);
 
   const add = (tool: ToolDefinition) => {
     let id = '';
@@ -66,16 +72,16 @@ export function LayersPanel({ store, tools }: { store: EditorStore; tools: reado
           <ul data-brand-pending>{template.pending.map((r) => <li key={r}>{r}</li>)}</ul>
         </section>
       )}
-      <h2 className="panel-title">Agregar</h2>
+      <h2 className="panel-title">Agregar · {env?.name ?? 'todas las tools'}</h2>
       <div className="add-tools">
-        {tools.map((tool) => (
+        {offered.map((tool) => (
           <button key={tool.id} data-add-tool={tool.id} onClick={() => add(tool)}>+ {tool.name}</button>
         ))}
       </div>
       <div className="add-animated">
         <select aria-label="Agregar con animación" value="" onChange={(e) => addAnimated(e.target.value)}>
           <option value="" disabled>Agregar con animación…</option>
-          {tools.filter((t) => t.animations).map((t) => (
+          {offered.filter((t) => t.animations).map((t) => (
             <optgroup key={t.id} label={t.name}>
               {Object.keys(t.animations!).map((name) => <option key={name} value={`${t.id}:${name}`}>{name}</option>)}
             </optgroup>
