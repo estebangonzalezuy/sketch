@@ -68,3 +68,12 @@ Piezas compartidas que se suman en el camino:
 - Ningún modo para Garments (Yuma) ni "Tool refs", como pide el brief.
 - Mandala lilac/brown y Extra Dimensions (Órbita, Propuesta): no se implementan como presets; quedan anotados.
 - La serif de CATALOG, del statement y del wordmark, el eyebrow con cuadrado naranja y el "PLACEHOLDER COPY": no se implementan.
+
+## Estado al cerrar el branch
+
+- **Commits:** notas → registro → pares locked + guardas + Archivo Narrow → A → B → C → D → E → F → G → tests + README → evidencia. Las piezas compartidas entraron con el primer modo que las usa: capas de modo y PNG con A, Stipple y blue noise con B, cuchilla, motas de papel y numeral híbrido con C.
+- **Branch:** el brief sugiere `feat/spray-moodboard-modes`; esta sesión solo puede pushear a `claude/relaxed-ramanujan-sxk4ua`, que además trae los commits de la tool base (todavía no están en `main`).
+- **Cambio de comportamiento en Base:** para cumplir "máximo 2 tintas" el modo Photo spray arranca en el par locked con Brand mix fijo en 1. La paleta completa y la pestaña Photo siguen ahí detrás de un flag. Las muestras generadas pasaron de fondo azul a verde.
+- **Guardas de azul:** el radio de la guarda es 0.12 en RGB 0..1 (unos 30 niveles por canal).
+- **No implementado:** degradé lima→cian (flag Q3), presets Propuesta de Órbita (mandala, Extra Dimensions), tipografías serif de los pines y acento naranja sobre un tercer color.
+- **Evidencia:** `docs/moodboard/` tiene, por modo, el MP4 de 2 s y el PNG del hold exportados con los botones de la app a 720p (4:5) en un Chromium headless con render por software. Los PNG tienen exactamente 2 colores (se cuentan en el PR).
