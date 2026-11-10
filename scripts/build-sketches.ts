@@ -66,6 +66,14 @@ const SKETCHES: Sketch[] = [
     build: 'vite',
     dir: 'motion-builder',
   },
+  {
+    slug: 'anticipator',
+    name: 'Anticipator',
+    what: 'Resortes reales y anticipación para animar texto: un Lab con diales, un generador de skill y un editor de timeline.',
+    stack: 'Vite · React · motion',
+    build: 'vite',
+    dir: 'anticipator',
+  },
 ];
 
 const run = (cmd: string, cwd: string) => execSync(cmd, { cwd, stdio: 'inherit' });

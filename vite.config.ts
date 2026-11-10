@@ -8,5 +8,7 @@ export default defineConfig({
   plugins: [react()],
   base: BASE,
   build: { target: 'es2022', cssCodeSplit: false, outDir: `dist${BASE}`, emptyOutDir: true },
-  test: { exclude: [...configDefaults.exclude, 'motion-builder/**', 'aerosol/**'] },
+  test: {
+    exclude: [...configDefaults.exclude, 'motion-builder/**', 'aerosol/**', 'anticipator/**'],
+  },
 });
