@@ -8,22 +8,20 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Studio } from '../src/types.ts';
+import { BASE } from '../vite.config.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const dist = resolve(root, 'dist');
+const dist = resolve(root, `dist${BASE}`);
+const base = BASE.replace(/\/$/, '');
 const studios: Studio[] = JSON.parse(readFileSync(resolve(root, 'src/data/studios.json'), 'utf8'));
 // Inline the (small) stylesheet so it doesn't block first paint with an extra request.
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8').replace(
-  /<link rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>/,
-  (_, href: string) => `<style>${readFileSync(resolve(dist, `.${href}`), 'utf8')}</style>`,
+  /<link rel="stylesheet"[^>]*href="[^"]*\/(assets\/[^"]+\.css)"[^>]*>/,
+  (_, href: string) => `<style>${readFileSync(resolve(dist, href), 'utf8')}</style>`,
 );
 
-const site = (
-  process.env.SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : '')
-).replace(/\/$/, '');
+// The collection is served from estebangonzalez.co/sketches (rewritten by the portfolio project).
+const site = (process.env.SITE_URL || 'https://estebangonzalez.co').replace(/\/$/, '');
 
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -32,8 +30,8 @@ const pad = (n: number) => String(n).padStart(3, '0');
 type Page = { path: string; title: string; description: string; image: string };
 
 function render(p: Page): string {
-  const url = `${site}${p.path}`;
-  const img = `${site}${p.image}`;
+  const url = `${site}${base}${p.path === '/' ? '' : p.path}`;
+  const img = `${site}${base}${p.image}`;
   const t = esc(p.title);
   const d = esc(p.description);
   return template
@@ -89,14 +87,10 @@ for (const p of pages) {
 }
 
 if (site) {
-  const urls = pages.map((p) => `  <url><loc>${esc(site + p.path)}</loc></url>`).join('\n');
+  const urls = pages.map((p) => `  <url><loc>${esc(site + base + p.path)}</loc></url>`).join('\n');
   writeFileSync(
     resolve(dist, 'sitemap.xml'),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
-  );
-  writeFileSync(
-    resolve(dist, 'robots.txt'),
-    `User-agent: *\nAllow: /\nSitemap: ${site}/sitemap.xml\n`,
   );
 }
 

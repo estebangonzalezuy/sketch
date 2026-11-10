@@ -5,11 +5,28 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [{ "source": "/((?!assets/|og/|fonts/).*)", "destination": "/index.html" }],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/sketches",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/sketches/motion-studios-index/((?!assets/|og/|fonts/).*)",
+      "destination": "/sketches/motion-studios-index/index.html"
+    }
+  ],
   "headers": [
     {
-      "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "source": "/sketches/:sketch/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }
