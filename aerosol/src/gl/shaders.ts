@@ -420,7 +420,8 @@ void main() {
   if (uHasA > 0.5 && uPhoto > 0.0) {
     vec3 ph = texture(uA, clamp((suv - 0.5) * uCoverA + 0.5, 0.0, 1.0)).rgb;
     float l = dot(ph, vec3(0.2126, 0.7152, 0.0722));
-    d = max(d, (1.0 - l) * uPhoto * rev);
+    // Figura y foto en XOR: el type se lee sobre las dos tintas de la foto.
+    d = abs(d - (1.0 - l) * uPhoto * rev);
   }
   outColor = vec4(mix(uBg, uFg, clamp(d, 0.0, 1.0)), texture(uCrisp, suv).r);
 }`;
