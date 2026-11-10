@@ -7,29 +7,28 @@
     <meta name="description" content="Turns photos and videos into a boiling, grainy airbrush look and exports an MP4." />
   </head>
   <body>
-    <header class="top">
-      <div class="brand"><span class="logo"></span>Aerosol</div>
-      <div class="top-right">
-        <span id="fps" class="fps"></span>
-        <div id="res"></div>
-        <button id="record" class="btn" type="button">Record with touch</button>
-        <button id="png" class="btn" type="button" title="Save the hold frame as PNG">PNG</button>
-        <button id="export" class="btn primary" type="button">Export</button>
-      </div>
+    <header class="topbar">
+      <div class="brand">Aerosol</div>
+      <button id="preset-load" type="button">Open preset</button>
+      <button id="preset-save" type="button">Save preset</button>
+      <button id="png" type="button" title="Save the hold frame as PNG">PNG</button>
+      <button id="export" class="primary" type="button">Export</button>
+      <span class="spacer"></span>
+      <label>Format <select id="frame"></select></label>
+      <label>Size <select id="res"></select></label>
+      <label>fps <span class="ro">30</span></label>
+      <label>Duration <span id="duration" class="ro">0.0 s</span></label>
+      <span id="fps" class="fps"></span>
     </header>
-    <aside id="left" class="col left"></aside>
+    <aside id="left" class="panel layers"></aside>
     <main class="stage">
       <div id="viewport" class="viewport">
         <canvas id="view"></canvas>
         <div id="rec-badge" class="rec-badge" hidden>● REC</div>
       </div>
-      <div class="transport">
-        <button id="play" class="icon-btn" type="button" aria-label="Pause"></button>
-        <input id="scrub" type="range" min="0" max="1" step="0.001" value="0" aria-label="Timeline" />
-        <span id="clock" class="clock">0.0 / 0.0 s</span>
-      </div>
     </main>
-    <aside id="right" class="col right"></aside>
+    <aside id="right" class="panel params"></aside>
+    <section id="timeline" class="timeline" aria-label="Timeline"></section>
     <div id="drop" class="drop" hidden><div>Drop photos or videos</div></div>
     <div id="overlay" class="overlay" hidden>
       <div class="dialog">

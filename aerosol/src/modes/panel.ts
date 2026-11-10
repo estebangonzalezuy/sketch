@@ -1,4 +1,4 @@
-import { el, segmented, slider } from '../ui';
+import { el, segmented, slider, textRow, toggleRow } from '../ui';
 import type { Dial, DialValue } from './types';
 
 export interface DialIO {
@@ -27,26 +27,18 @@ export function buildDials(parent: HTMLElement, dials: Dial[], io: DialIO): Dial
         return { dial: d, set: (v) => c.set(Number(v)) };
       }
       case 'choice': {
-        const wrap = el('div', { class: 'dial-row' }, el('span', { class: 'slider-label' }, d.label));
+        const wrap = el('div', { class: 'dial-row-inline' }, el('span', { class: 'dial-label' }, d.label));
         parent.append(wrap);
         const c = segmented(wrap, d.options, String(io.get(d)), (v) => io.set(d, v));
         return { dial: d, set: (v) => c.set(String(v)) };
       }
       case 'toggle': {
-        const input = el('input', { type: 'checkbox', id: `dial-${d.id}` });
-        input.checked = Boolean(io.get(d));
-        input.addEventListener('change', () => io.set(d, input.checked));
-        parent.append(el('label', { class: 'toggle', for: `dial-${d.id}` }, input, el('span', {}, d.label)));
-        return { dial: d, set: (v) => (input.checked = Boolean(v)) };
+        const c = toggleRow(parent, d.label, Boolean(io.get(d)), (v) => io.set(d, v));
+        return { dial: d, set: (v) => c.set(Boolean(v)) };
       }
       case 'text': {
-        const input = d.multiline
-          ? el('textarea', { rows: '3', spellcheck: 'false', id: `dial-${d.id}` })
-          : el('input', { type: 'text', spellcheck: 'false', class: 'text-input', id: `dial-${d.id}` });
-        input.value = String(io.get(d));
-        input.addEventListener('input', () => io.set(d, input.value));
-        parent.append(el('label', { class: 'text-dial', for: `dial-${d.id}` }, el('span', { class: 'slider-label' }, d.label), input));
-        return { dial: d, set: (v) => (input.value = String(v)) };
+        const c = textRow(parent, d.label, String(io.get(d)), (v) => io.set(d, v), d.multiline, `dial-${d.id}`);
+        return { dial: d, set: (v) => c.set(String(v)) };
       }
     }
   });

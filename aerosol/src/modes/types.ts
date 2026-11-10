@@ -52,6 +52,8 @@ export interface ModeDef {
   group: Group;
   category: string;
   status: Status;
+  /** Nombre del tramo de entrada en el timeline (antes del hold). */
+  introLabel?: string;
   /** Orden dentro del grupo en el selector. */
   order?: number;
   /** Par locked al abrir el modo (id de `pairs.ts`), o null para no tocar el par. */

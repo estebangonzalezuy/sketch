@@ -14,6 +14,7 @@ npm run build    # tsc + vite build en dist/
 npm test         # tests de la línea de tiempo y la paleta
 ```
 
+- La UI sigue la de Motion Builder: barra arriba (presets, PNG, Export, formato, tamaño), modos y media como capas a la izquierda, carpetas plegables con sliders estilo DialKit a la derecha y timeline abajo (clips de media o fases del modo, trazos grabados como keys, playhead que se arrastra sobre la regla).
 - **Espacio** pausa. **PNG** guarda el frame del hold (still first); **Export** el MP4 del loop. Doble clic en el valor de un slider lo vuelve al valor por defecto.
 - Arrastrá fotos o videos a cualquier parte de la ventana. La lista de Media se reordena arrastrando y se reproduce de arriba hacia abajo; clic en una fila salta a esa media.
 - Los parámetros se guardan en `localStorage`.

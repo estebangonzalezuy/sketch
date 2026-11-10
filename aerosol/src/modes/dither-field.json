@@ -2,6 +2,7 @@
   "id": "dither-field",
   "label": "G · Dither Field",
   "group": "Moodboard",
+  "introLabel": "sweep",
   "order": 7,
   "category": "Hex",
   "status": "propuesta",

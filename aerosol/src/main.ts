@@ -20,6 +20,7 @@ import { clipDuration, sampleTimeline, totalDuration, type Clip } from './timeli
 import { Brush, eventsBetween, type TouchEvt } from './touch';
 import { download, exportVideo } from './export';
 import { el, section, segmented, slider, type Control } from './ui';
+import { TimelineView, type TlRow } from './timeline-ui';
 import { BASE_MODE, MODES, dialDefaults, getMode, modesIn } from './modes/registry';
 import { GROUPS, type Dial, type DialValue, type DialValues, type ModeDef } from './modes/types';
 import { buildDials, type DialControl } from './modes/panel';
@@ -543,7 +544,7 @@ function loop(now: number): void {
   }
   const total = loopLength();
   boilClock += dt;
-  if (playing && total > 0) {
+  if (playing && total > 0 && !scrubbing) {
     const prev = time;
     time += dt;
     if (time >= total) {
@@ -568,30 +569,78 @@ function loop(now: number): void {
   updateTransport(total);
 }
 
-// ---------------------------------------------------------------- Transport
+// ---------------------------------------------------------------- Timeline (como en Motion Builder)
 
-const playBtn = document.querySelector<HTMLButtonElement>('#play')!;
-const scrub = document.querySelector<HTMLInputElement>('#scrub')!;
-const clock = document.querySelector<HTMLElement>('#clock')!;
 let scrubbing = false;
+const timeline = new TimelineView(document.querySelector<HTMLElement>('#timeline')!, {
+  onSeek: (t) => {
+    scrubbing = true;
+    time = Math.min(t, Math.max(0, loopLength() - 1e-3));
+  },
+  onScrubEnd: () => (scrubbing = false),
+  onTogglePlay: () => setPlaying(!playing),
+  onRecord: () => (recording ? stopRecording() : startRecording()),
+  onResetSmear: () => {
+    renderer.resetSmear();
+    brush.reset();
+  },
+  onClearStrokes: () => {
+    events = [];
+  },
+});
+const durationEl = document.querySelector<HTMLElement>('#duration')!;
 
 function setPlaying(p: boolean): void {
   playing = p;
-  playBtn.classList.toggle('paused', !p);
-  playBtn.setAttribute('aria-label', p ? 'Pause' : 'Play');
+}
+
+/** Filas del timeline: clips de media (Base) o fases del modo, y los trazos grabados como keys. */
+function timelineRows(total: number): TlRow[] {
+  const rows: TlRow[] = [];
+  if (isBase()) {
+    let at = 0;
+    const list = clips();
+    rows.push({
+      label: 'Media',
+      note: `${media.length} item${media.length === 1 ? '' : 's'}`,
+      clips: media.map((m, i) => {
+        const d = list[i].duration;
+        const c = {
+          label: m.name,
+          start: at,
+          end: at + d,
+          fade: media.length > 1 ? Math.min(params.fade, d * 0.5) : 0,
+          current: i === currentIndex,
+          kind: 'media' as const,
+        };
+        at += d;
+        return c;
+      }),
+    });
+  } else {
+    const m = mode();
+    const hold = Number(modeValues().hold ?? 0);
+    const intro = Math.max(0, total - hold);
+    rows.push({
+      label: m.label.replace(/^\w · /, ''),
+      note: m.status === 'propuesta' ? 'propuesta' : '',
+      clips: [
+        { label: m.introLabel ?? 'intro', start: 0, end: intro, kind: 'intro' },
+        { label: 'hold', start: intro, end: total, kind: 'hold' },
+      ],
+    });
+  }
+  rows.push({ label: 'Touch', note: 'strokes', sub: true, keys: events.filter((e) => e.type === 'down').map((e) => e.t) });
+  return rows;
 }
 
 function updateTransport(total: number): void {
-  if (!scrubbing) scrub.value = String(total > 0 ? time / total : 0);
-  clock.textContent = `${time.toFixed(1)} / ${total.toFixed(1)} s`;
+  timeline.setRows(timelineRows(total), total);
+  timeline.update(time, total, playing, recording, events.filter((e) => e.type === 'down').length);
+  durationEl.textContent = `${total.toFixed(1)} s`;
+  recBadge.hidden = !recording;
 }
 
-playBtn.addEventListener('click', () => setPlaying(!playing));
-scrub.addEventListener('input', () => {
-  scrubbing = true;
-  time = Number(scrub.value) * loopLength();
-});
-scrub.addEventListener('change', () => (scrubbing = false));
 window.addEventListener('keydown', (e) => {
   const t = e.target as HTMLElement;
   if (e.code === 'Space' && !['TEXTAREA', 'INPUT'].includes(t.tagName) && t.tagName !== 'BUTTON') {
@@ -624,7 +673,6 @@ canvas.addEventListener('pointermove', (e) => {
 canvas.addEventListener('pointerup', (e) => touch(e, 'up'));
 canvas.addEventListener('pointercancel', (e) => touch(e, 'up'));
 
-const recordBtn = document.querySelector<HTMLButtonElement>('#record')!;
 const recBadge = document.querySelector<HTMLElement>('#rec-badge')!;
 
 function startRecording(): void {
@@ -635,10 +683,6 @@ function startRecording(): void {
   renderer.resetSmear();
   brush.reset();
   setPlaying(true);
-  recordBtn.textContent = 'Stop recording';
-  recordBtn.classList.add('recording');
-  recBadge.hidden = false;
-  renderTouchStatus();
 }
 
 function stopRecording(): void {
@@ -649,13 +693,7 @@ function stopRecording(): void {
     const l = events[events.length - 1];
     events.push({ ...l, type: 'up', t: Math.min(l.t + 1e-3, loopLength() - 1e-3) });
   }
-  recordBtn.textContent = 'Record with touch';
-  recordBtn.classList.remove('recording');
-  recBadge.hidden = true;
-  renderTouchStatus();
 }
-
-recordBtn.addEventListener('click', () => (recording ? stopRecording() : startRecording()));
 
 // ---------------------------------------------------------------- Export
 
@@ -790,12 +828,48 @@ const left = document.querySelector<HTMLElement>('#left')!;
 const right = document.querySelector<HTMLElement>('#right')!;
 const fileInput = document.querySelector<HTMLInputElement>('#file')!;
 
-const dialsBody = section(left, 'Dials');
+// Columna derecha: título del modo activo y carpetas, en el orden de uso.
+const rightTitle = el('h2', { class: 'panel-title params-title' });
+const slot = () => el('div', { class: 'slot' });
+const rightMode = slot();
+const rightDials = slot();
+const rightText = slot();
+const rightRest = slot();
+const rightTouch = slot();
+right.append(rightTitle, rightMode, rightDials, rightText, rightRest, rightTouch);
+const dialsBody = section(rightDials, 'Dials');
 const dialsRoot = dialsBody.parentElement!;
-const dialsHead = dialsRoot.querySelector('.hint')!;
 let dialControls: DialControl[] = [];
 
-const mediaBody = section(left, 'Media', 'plays top to bottom');
+// Columna izquierda, como las capas de Motion Builder: los modos como tarjetas y la media.
+const modesBody = section(left, 'Modes', 'one preset each', 'panel');
+const modeList = el('div', { class: 'layer-list' });
+modesBody.append(modeList);
+function renderModeList(): void {
+  modeList.replaceChildren(
+    ...GROUPS.flatMap((g) => {
+      const list = modesIn(g);
+      const head = el('div', { class: 'layer-group' }, g, ...(list.length ? [] : [el('small', {}, ' · no modes in this repo')]));
+      return [
+        head,
+        ...list.map((m) => {
+          const b = el(
+            'button',
+            { class: 'layer', type: 'button', 'data-selected': String(m.id === params.mode), 'aria-pressed': String(m.id === params.mode) },
+            el('span', {}, m.label),
+            el('small', {}, m.category + (m.status === 'propuesta' ? ' · propuesta' : '')),
+          );
+          b.addEventListener('click', () => {
+            if (m.id !== params.mode) applyMode(m.id, true);
+          });
+          return b;
+        }),
+      ];
+    }),
+  );
+}
+
+const mediaBody = section(left, 'Media', 'plays top to bottom', 'panel');
 const mediaRoot = mediaBody.parentElement!;
 const mediaList = el('div', { class: 'media-list' });
 const addBtn = el('button', { class: 'add', type: 'button' }, '+ Add photos or videos');
@@ -890,9 +964,9 @@ window.addEventListener('drop', (e) => {
 });
 
 // Texto
-const textBody = section(left, 'Text');
+const textBody = section(rightText, 'Text');
 const textRoot = textBody.parentElement!;
-const textarea = el('textarea', { placeholder: 'Type a headline…', rows: '3', spellcheck: 'false' });
+const textarea = el('textarea', { placeholder: 'Type a headline…', rows: '3', spellcheck: 'false', class: 'text-box', 'aria-label': 'Text' });
 textarea.value = params.text;
 textarea.addEventListener('input', () => {
   params.text = textarea.value;
@@ -919,53 +993,25 @@ const textSwatches = el('div', { class: 'swatches' });
 textBody.append(textSwatches);
 
 // Touch
-const touchBody = section(left, 'Touch', 'drag on the canvas');
+const touchBody = section(rightTouch, 'Touch', 'drag on the canvas');
 numSlider(touchBody, 'brush', 'Brush', 0.02, 0.4, 0.01, 2);
 numSlider(touchBody, 'spring', 'Spring back', 0, 1, 0.01, 2);
-const touchStatus = el('span', {});
-const clearTouch = el('button', { class: 'link', type: 'button' }, 'Clear');
-const resetSmear = el('button', { class: 'link', type: 'button' }, 'Reset smear');
-clearTouch.addEventListener('click', () => {
-  events = [];
-  renderTouchStatus();
-});
-resetSmear.addEventListener('click', () => {
-  renderer.resetSmear();
-  brush.reset();
-});
-touchBody.append(el('div', { class: 'link-row' }, touchStatus, el('span', {}, resetSmear, ' · ', clearTouch)));
 if (!renderer.smearOk) touchBody.append(el('p', { class: 'note' }, 'Smear needs float render targets, which this browser lacks.'));
 
-function renderTouchStatus(): void {
-  const strokes = events.filter((e) => e.type === 'down').length;
-  touchStatus.textContent = recording
-    ? 'Recording… drag on the canvas'
-    : strokes
-      ? `${strokes} recorded stroke${strokes === 1 ? '' : 's'} (exported)`
-      : 'No recorded strokes';
-  clearTouch.disabled = !strokes || recording;
-}
+/** El estado de los trazos se ve en el timeline. */
+function renderTouchStatus(): void {}
 
 // ---------------------------------------------------------------- Panel derecho
 
 // Modo: selector agrupado (Base, Figma Q3, Moodboard), status, flags y presets.
-const modeBody = section(right, 'Mode');
-const modeSelect = el('select', { id: 'mode-select', class: 'select', 'aria-label': 'Mode' });
-for (const g of GROUPS) {
-  const list = modesIn(g);
-  const og = el('optgroup', { label: list.length ? g : `${g} (sin modos en este repo)` });
-  if (!list.length) og.setAttribute('disabled', '');
-  for (const m of list) og.append(el('option', { value: m.id }, m.label));
-  if (!list.length) og.append(el('option', { value: '', disabled: '' }, '—'));
-  modeSelect.append(og);
-}
+const modeBody = section(rightMode, 'Mode');
 const modeMeta = el('div', { class: 'mode-meta' });
 const flagsBox = el('div', { class: 'flags' });
-const presetSave = el('button', { class: 'link', type: 'button' }, 'Save preset');
-const presetLoad = el('button', { class: 'link', type: 'button' }, 'Load preset');
+const presetSave = document.querySelector<HTMLButtonElement>('#preset-save')!;
+const presetLoad = document.querySelector<HTMLButtonElement>('#preset-load')!;
 const presetInput = el('input', { type: 'file', accept: 'application/json,.json', hidden: '' });
-modeBody.append(modeSelect, modeMeta, flagsBox, el('div', { class: 'link-row' }, el('span', {}, presetSave, ' · ', presetLoad), presetInput));
-modeSelect.addEventListener('change', () => applyMode(modeSelect.value, true));
+modeBody.append(modeMeta, flagsBox, presetInput);
+
 
 function setDial(d: Dial, v: DialValue): void {
   if (d.bind) {
@@ -994,7 +1040,8 @@ function renderEmpty(): void {
 
 function renderModeMeta(): void {
   const m = mode();
-  modeSelect.value = m.id;
+  rightTitle.textContent = m.label;
+  renderModeList();
   modeMeta.replaceChildren(
     el('span', { class: `chip ${m.status}` }, m.status === 'aprobada' ? 'Aprobada' : 'Propuesta'),
     el('span', { class: 'hint' }, m.category),
@@ -1053,7 +1100,7 @@ function applyMode(id: string, fromUser: boolean): void {
   dialsRoot.hidden = base;
   mediaRoot.hidden = !base && !m.dials.some((d) => d.id === 'photo');
   textRoot.hidden = !base;
-  dialsHead.textContent = m.label;
+  motionRoot.hidden = !base;
   dialControls = buildDials(dialsBody, m.dials, { get: (d) => modeValues(m)[d.id], set: setDial });
   renderModeMeta();
   onModeVisualsChanged();
@@ -1097,15 +1144,32 @@ presetInput.addEventListener('change', async () => {
   }
 });
 
-const frameBody = section(right, 'Frame');
-segmented(frameBody, Object.keys(FRAMES) as FrameKey[], params.frame, (v) => {
-  params.frame = v;
+// Barra superior: formato y tamaño, como Formato/fps/Duración en Motion Builder.
+function topSelect<T extends string>(id: string, options: [T, string][], value: T, onChange: (v: T) => void): void {
+  const sel = document.querySelector<HTMLSelectElement>(id)!;
+  sel.replaceChildren(...options.map(([v, l]) => el('option', { value: v }, l)));
+  sel.value = value;
+  sel.addEventListener('change', () => onChange(sel.value as T));
+}
+topSelect<FrameKey>(
+  '#frame',
+  (Object.keys(FRAMES) as FrameKey[]).map((k) => [k, k]),
+  params.frame,
+  (v) => {
+    params.frame = v;
+    refreshText();
+    fitCanvas();
+    save();
+  },
+);
+topSelect<Params['res']>('#res', [['720p', '720p'], ['1080p', '1080p']], params.res, (v) => {
+  params.res = v;
   refreshText();
   fitCanvas();
   save();
 });
 
-const colourBody = section(right, 'Colour');
+const colourBody = section(rightRest, 'Colour');
 const pairSwatches = el('div', { class: 'pair-swatches' });
 const pairLabel = el('span', { class: 'pair-label' });
 const skipPair = el('button', { class: 'btn small', type: 'button', title: 'Next locked pair' }, 'Skip pair');
@@ -1202,7 +1266,7 @@ function renderColour(): void {
   );
 }
 
-const paintBody = section(right, 'Paint');
+const paintBody = section(rightRest, 'Paint');
 const styleSeg = segmented<Style>(
   paintBody,
   [
@@ -1223,7 +1287,9 @@ const styleSeg = segmented<Style>(
 // Stipple (1 bit): matriz y celda. Solo se ven con ese estilo.
 const stippleBox = el('div', { class: 'section-body' });
 paintBody.append(stippleBox);
-const matrixSeg = segmented(stippleBox, [
+const matrixRow = el('div', { class: 'dial-row-inline' }, el('span', { class: 'dial-label' }, 'Matrix'));
+stippleBox.append(matrixRow);
+const matrixSeg = segmented(matrixRow, [
   { value: 'bayer', label: 'Bayer' },
   { value: 'blue-noise', label: 'Blue noise' },
 ] as { value: Params['matrix']; label: string }[], params.matrix, (v) => {
@@ -1243,17 +1309,18 @@ numSlider(paintBody, 'saturation', 'Saturation', 0, 2.5, 0.01, 2);
 numSlider(paintBody, 'pale', 'Pale ground', 0, 1, 0.01, 2);
 numSlider(paintBody, 'boil', 'Boil', 0, 3, 0.01, 2);
 
-const fxBody = section(right, 'Effects', 'stack on any style');
+const fxBody = section(rightRest, 'Effects', 'stack on any style');
 numSlider(fxBody, 'wave', 'Wave', 0, 1, 0.01, 2);
 numSlider(fxBody, 'glass', 'Glass', 0, 1, 0.01, 2);
 numSlider(fxBody, 'chroma', 'Chroma', 0, 1, 0.01, 2);
 numSlider(fxBody, 'glow', 'Glow', 0, 1, 0.01, 2);
 
-const motionBody = section(right, 'Motion');
+const motionBody = section(rightRest, 'Motion', 'media timing');
+const motionRoot = motionBody.parentElement!;
 numSlider(motionBody, 'hold', 'Hold', 0.5, 8, 0.1, 1, 's');
 numSlider(motionBody, 'fade', 'Fade', 0, 3, 0.1, 1, 's');
 
-const resetBody = section(right, 'Reset');
+const resetBody = section(rightRest, 'Reset');
 const resetAll = el('button', { class: 'link', type: 'button' }, 'Restore all defaults');
 resetAll.addEventListener('click', () => {
   const keep = { text: params.text };
@@ -1264,13 +1331,6 @@ resetAll.addEventListener('click', () => {
 });
 resetBody.append(resetAll);
 
-// Header: resolución
-segmented(document.querySelector<HTMLElement>('#res')!, ['720p', '1080p'] as const, params.res, (v) => {
-  params.res = v;
-  refreshText();
-  fitCanvas();
-  save();
-});
 
 // ---------------------------------------------------------------- Layout del canvas
 
