@@ -4,6 +4,8 @@ import type { ToolDefinition } from '../core/tool';
 import { templateOf, templates } from '../brand';
 import { blankProject } from '../demo';
 import { ExportDialog } from './ExportDialog';
+import { EnvironmentDialog } from './EnvironmentDialog';
+import { allEnvironments, DEFAULT_ENVIRONMENT, environmentOf, useEnvironments } from '../environments';
 import { projectFont, projectFontOptions, setProjectFont } from './ops';
 import { ProjectFile } from './persistence';
 import { useEditor, type EditorStore } from './store';
@@ -21,6 +23,11 @@ export function ProjectBar({ store, tools }: { store: EditorStore; tools: readon
   const file = useRef(new ProjectFile(store.assets));
   const [saved, setSaved] = useState<Project>(project);
   const [message, setMessage] = useState<string | null>(null);
+  const [envDialog, setEnvDialog] = useState<'new' | 'edit' | null>(null);
+  useEnvironments();
+  const envId = project.environmentId ?? DEFAULT_ENVIRONMENT;
+  const env = environmentOf(envId);
+  const setEnvironment = (id: string) => change({ environmentId: id }, 'project.environment');
 
   const change = (partial: Partial<Project>, gesture?: string) => store.edit((p) => ({ ...p, ...partial }), gesture);
   const attempt = async (action: () => Promise<void>) => {
@@ -48,6 +55,9 @@ export function ProjectBar({ store, tools }: { store: EditorStore; tools: readon
     const [templateId, index] = value.split(':');
     const template = templates.find((t) => t.id === templateId);
     const next = template ? structuredClone(template.projects[Number(index)].project) : blankProject();
+    // "env:<id>": proyecto vacío en ese entorno. "Vacío" sigue en el entorno actual.
+    if (templateId === 'env') next.environmentId = index;
+    else if (!template) next.environmentId = store.getState().project.environmentId;
     file.current.forget();
     store.load(next);
     setSaved(next);
@@ -73,11 +83,43 @@ export function ProjectBar({ store, tools }: { store: EditorStore; tools: readon
   return (
     <header className="topbar">
       <strong>Motion Builder</strong>
+      <label>
+        Entorno
+        <select
+          aria-label="Entorno"
+          value={env ? envId : ''}
+          title={env?.description}
+          onChange={(e) => (e.target.value === '+new' ? setEnvDialog('new') : setEnvironment(e.target.value))}
+        >
+          {!env && <option value="">{envId} (no está en este navegador)</option>}
+          <optgroup label="De fábrica">
+            {allEnvironments().filter((e) => e.builtIn).map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
+          </optgroup>
+          {allEnvironments().some((e) => !e.builtIn) && (
+            <optgroup label="Propios">
+              {allEnvironments().filter((e) => !e.builtIn).map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
+            </optgroup>
+          )}
+          <option value="+new">Armar entorno…</option>
+        </select>
+      </label>
+      {env && !env.builtIn && <button onClick={() => setEnvDialog('edit')}>Editar entorno</button>}
+      <EnvironmentDialog
+        open={envDialog !== null}
+        editing={envDialog === 'edit' ? env : null}
+        tools={tools}
+        onDone={(id, deleted) => {
+          setEnvDialog(null);
+          if (id) setEnvironment(id);
+          else if (deleted) setEnvironment(DEFAULT_ENVIRONMENT);
+        }}
+      />
       <input className="project-name" aria-label="Nombre del proyecto" value={project.name} onChange={(e) => change({ name: e.target.value }, 'project.name')} />
       <span className="dirty" data-dirty={project !== saved}>{project !== saved ? 'Sin guardar' : 'Guardado'}</span>
       <select aria-label="Nuevo proyecto" value="" onChange={(e) => create(e.target.value)}>
         <option value="" disabled>Nuevo…</option>
         <option value="blank">Vacío</option>
+        {allEnvironments().map((e) => <option key={e.id} value={`env:${e.id}`}>Vacío · {e.name}</option>)}
         {templates.flatMap((t) => t.projects.map((p, i) => <option key={`${t.id}:${i}`} value={`${t.id}:${i}`}>{t.name} · {p.name}</option>))}
       </select>
       <button onClick={() => void open()}>Abrir</button>

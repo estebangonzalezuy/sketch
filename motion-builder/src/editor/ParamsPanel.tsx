@@ -9,6 +9,7 @@ import { addAsset, applyAnimation, applyValues, CENTER_TRACK, hasKeyAt, insideCl
 import { pickImage } from './persistence';
 import { loadUserPresets, saveUserPreset } from './presets';
 import { useEditor, type EditorStore } from './store';
+import { clearStrokes, strokesOf } from './strokes';
 
 /** Potencia de 10 cerca de una milésima del rango: sin step propio, los valores quedan redondos. */
 const defaultStep = (min: number, max: number) => 10 ** Math.floor(Math.log10((max - min) / 1000));
@@ -33,6 +34,18 @@ function ParamControl({ id, spec, value, onChange }: { id: string; spec: ParamSp
     case 'text':
       return <TextControl label={label} value={value as string} onChange={onChange} />;
   }
+}
+
+/** Trazos de smear grabados en la capa: cuántos hay y cómo borrarlos. Se pintan arrastrando en el canvas. */
+function StrokesRow({ store, layer }: { store: EditorStore; layer: Layer }) {
+  const count = strokesOf(layer).length;
+  return (
+    <div className="param-row strokes-row" data-param="strokes">
+      <span className="key-note">{count ? `${count} trazo${count === 1 ? '' : 's'} grabado${count === 1 ? '' : 's'}` : 'Sin trazos: arrastrá en el canvas'}</span>
+      <button disabled={!count} onClick={() => store.edit((p) => clearStrokes(p, layer.id, store.getState().frame))}>Borrar</button>
+      <span />
+    </div>
+  );
 }
 
 type KeyState = 'on' | 'animated' | 'off' | 'outside';
@@ -318,9 +331,13 @@ export function ParamsPanel({ store, tools }: { store: EditorStore; tools: reado
         <PresetControls store={store} layer={layer} tool={tool} project={project} />
         {[...groups].map(([group, ids]) => (
           <Folder key={group} title={group} defaultOpen>
-            {ids.map((id) => (
-              <ParamRow key={id} store={store} layerId={layer.id} id={id} spec={tool.params[id]} value={values[id]} state={keyState(layer.params[id], at, inside)} />
-            ))}
+            {ids.map((id) =>
+              tool.params[id].hidden ? (
+                id === 'strokes' && <StrokesRow key={id} store={store} layer={layer} />
+              ) : (
+                <ParamRow key={id} store={store} layerId={layer.id} id={id} spec={tool.params[id]} value={values[id]} state={keyState(layer.params[id], at, inside)} />
+              ),
+            )}
           </Folder>
         ))}
       </div>

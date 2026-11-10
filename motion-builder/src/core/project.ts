@@ -45,6 +45,7 @@ const projectV1 = z.object({
   fps: z.number().int().positive(),
   durationFrames: z.number().int().positive(),
   brandTemplateId: z.string().nullable(),
+  environmentId: z.string().optional(), // entorno: qué tools ofrece el editor (src/environments); sin valor, Inception
   assets: z.array(z.object({ id: z.string(), kind: z.literal('image'), path: z.string() })),
   layers: z.array(layer), // índice 0 = capa superior
 });

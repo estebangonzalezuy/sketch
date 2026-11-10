@@ -39,6 +39,7 @@ export function makeProject(layers: Layer[], over: Partial<Project> = {}): Proje
     fps: 30,
     durationFrames: 300,
     brandTemplateId: null,
+    environmentId: 'inception',
     assets: [],
     layers,
     ...over,

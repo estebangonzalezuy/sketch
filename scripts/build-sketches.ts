@@ -35,14 +35,6 @@ const SKETCHES: Sketch[] = [
     build: 'root',
   },
   {
-    slug: 'aerosol',
-    name: 'Aerosol',
-    what: 'Fotos y videos a aerógrafo granulado que hierve, con morph, paleta de marca, tipografía y export MP4.',
-    stack: 'Vite · TypeScript · WebGL2',
-    build: 'vite',
-    dir: 'aerosol',
-  },
-  {
     slug: 'tag-shader',
     name: 'Tag Shader',
     what: 'Mosaico animado de palabras que lee la luminancia de una fuente, a pantalla completa.',
@@ -61,7 +53,7 @@ const SKETCHES: Sketch[] = [
   {
     slug: 'motion-builder',
     name: 'Motion Builder',
-    what: 'Editor de motion con timeline y capas. Solo Chrome.',
+    what: 'Editor de motion con timeline y capas, por entornos: Inception, Spray (aerógrafo granulado, modos moodboard, smear) o uno propio. Solo Chrome.',
     stack: 'Vite · React · TypeScript',
     build: 'vite',
     dir: 'motion-builder',

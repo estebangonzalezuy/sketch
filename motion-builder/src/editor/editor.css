@@ -145,3 +145,20 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
 .add-animated { padding: 0 14px 14px; }
 .add-animated select { width: 100%; font: inherit; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 6px; padding: 5px 6px; }
+
+/* Entornos */
+.env-dialog { width: 460px; }
+.env-dialog form { display: flex; flex-direction: column; }
+.env-dialog input:not([type='checkbox']) { flex: 1; max-width: 280px; }
+.env-groups { display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow: auto; margin-bottom: 12px; }
+.env-group { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px 10px; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; }
+.env-group legend { display: flex; align-items: center; gap: 8px; padding: 0 4px; color: var(--text); font-weight: 600; }
+.env-dialog .env-tool { justify-content: flex-start; margin: 0; color: var(--text); gap: 8px; }
+.env-tool input { accent-color: var(--accent); }
+.env-all { padding: 0 6px; font-size: 11px; font-weight: 400; }
+.env-delete { color: var(--danger); }
+
+/* Trazos de smear */
+.viewport-canvas[data-paint='true'] { cursor: crosshair; touch-action: none; }
+.paint-hint { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); padding: 3px 10px; border-radius: 99px; background: rgb(0 0 0 / 0.55); color: var(--muted); font-size: 12px; pointer-events: none; }
+.strokes-row .key-note { color: var(--muted); }
