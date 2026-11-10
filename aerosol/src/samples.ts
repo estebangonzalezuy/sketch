@@ -29,8 +29,8 @@ function blob(ctx: CanvasRenderingContext2D, x: number, y: number, rx: number, r
 export function portrait(): HTMLCanvasElement {
   const [c, ctx] = canvas();
   const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#1d3ee6');
-  bg.addColorStop(1, '#0f27b8');
+  bg.addColorStop(0, '#2f9a63');
+  bg.addColorStop(1, '#1d6e45');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
   ctx.filter = 'blur(10px)';

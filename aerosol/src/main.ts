@@ -24,6 +24,8 @@ import { BASE_MODE, MODES, dialDefaults, getMode, modesIn } from './modes/regist
 import { GROUPS, type Dial, type DialValue, type DialValues, type ModeDef } from './modes/types';
 import { buildDials, type DialControl } from './modes/panel';
 import { IMPLS } from './modes/impl';
+import { LOCKED_PAIRS, getPair, guardColor, nextPair, randomPair } from './pairs';
+import { hexToRgb } from './palette';
 
 // ---------------------------------------------------------------- Parámetros
 
@@ -64,6 +66,9 @@ interface Params {
   dials: Record<string, DialValues>;
   /** Flags "fuera de pares locked" prendidos, por modo. */
   flags: Record<string, string[]>;
+  /** Par locked activo (se sortea al cargar) e inversión campo/figura. */
+  pair: string;
+  invert: boolean;
 }
 
 const DEFAULTS: Params = {
@@ -97,6 +102,8 @@ const DEFAULTS: Params = {
   mode: BASE_MODE,
   dials: {},
   flags: {},
+  pair: LOCKED_PAIRS[0].id,
+  invert: false,
 };
 
 const STORE_KEY = 'aerosol:params:v1';
@@ -118,6 +125,9 @@ function loadParams(): Params {
 }
 
 const params = loadParams();
+// Al cargar, uno de los 4 pares locked al azar.
+params.pair = randomPair().id;
+params.invert = false;
 let saveTimer = 0;
 function save(): void {
   clearTimeout(saveTimer);
@@ -195,12 +205,41 @@ function clips(): Clip[] {
   return media.map((m) => ({ duration: clipDuration(m.kind, params.hold, m.videoDuration) }));
 }
 
+/** Tintas activas: el par locked, o el de un flag "fuera de pares locked" prendido. */
+function inks(): { field: RGB; figure: RGB; label: string; unlocked: boolean } {
+  const flag = mode().optionalUnlocked.find((f) => f.pair && flagOn(f.id));
+  const src = flag?.pair ?? getPair(params.pair);
+  let field = hexToRgb(src.field);
+  let figure = hexToRgb(src.figure);
+  if (params.invert) [field, figure] = [figure, field];
+  return { field, figure, label: flag ? flag.label : getPair(params.pair).label, unlocked: !!flag };
+}
+
+/** Sin el flag de paleta completa, toda pieza usa solo las 2 tintas del par. */
+function lockedPalette(): boolean {
+  return !(isBase() && flagOn('full-palette'));
+}
+
+function pairPalette(): Palette {
+  const { field, figure } = inks();
+  const all = [0, 1];
+  return {
+    colors: [field, figure],
+    names: ['Field', 'Figure'],
+    presets: { Full: all, Primary: all, Duo: all, Warm: all, Cool: all },
+    paper: field,
+    text: 1,
+  };
+}
+
 function palette(): Palette {
+  if (lockedPalette()) return pairPalette();
   return params.tab === 'brand' ? brand : photo;
 }
 
 function activeIdx(): number[] {
   const pal = palette();
+  if (lockedPalette()) return [0, 1];
   const list = params.active[params.tab];
   if (list) return list.filter((i) => i < pal.colors.length);
   return pal.presets[params.preset[params.tab] ?? 'Full'];
@@ -208,6 +247,7 @@ function activeIdx(): number[] {
 
 function textColor(): RGB {
   const pal = palette();
+  if (lockedPalette()) return pal.colors[pal.text];
   const i = params.textColor[params.tab];
   return pal.colors[i >= 0 && i < pal.colors.length ? i : pal.text];
 }
@@ -278,7 +318,8 @@ function refreshPhotoPalette(): void {
     photo = brand;
   } else {
     const all = sampleColors(media);
-    photo = photoPalette(extractPalette(all, 8));
+    // Los azules retirados nunca llegan a un swatch: se remapean a la tinta de figura.
+    photo = photoPalette(extractPalette(all, 8).map((c) => guardColor(c, inks().figure)));
     // Submuestra para los votos de Riso.
     pixelSamples = new Float32Array(Math.floor(all.length / 12) * 3);
     for (let i = 0; i < pixelSamples.length / 3; i++) pixelSamples.set(all.subarray(i * 12, i * 12 + 3), i * 3);
@@ -352,7 +393,8 @@ function syncVideosLive(a: number, b: number, localA: number, localB: number): v
 
 function frameParams(t: number, tick: number, a: SourceRef | null, b: SourceRef | null, fade: number): FrameParams {
   const pal = palette();
-  const colors = activeIdx().map((i) => pal.colors[i]);
+  const ink = inks();
+  const colors = activeIdx().map((i) => guardColor(pal.colors[i], ink.figure));
   const riso = risoInks(colors);
   return {
     a,
@@ -362,15 +404,16 @@ function frameParams(t: number, tick: number, a: SourceRef | null, b: SourceRef 
     tick,
     hasText,
     textEffect: params.textEffect,
-    textColor: textColor(),
+    textColor: guardColor(textColor(), ink.figure),
+    guard: [ink.field, ink.figure],
     airbrush: params.airbrush,
     saturation: params.saturation,
     pale: params.pale,
     grain: params.grain,
     flatten: params.flatten,
-    brandMix: params.brandMix,
+    brandMix: lockedPalette() ? 1 : params.brandMix,
     style: params.style,
-    paper: pal.paper,
+    paper: guardColor(pal.paper, ink.field),
     palette: colors,
     paletteLab: colors.map(rgbToOklab),
     inks: riso.inks,
@@ -855,6 +898,10 @@ function applyMode(id: string, fromUser: boolean): void {
   const m = getMode(id);
   params.mode = m.id;
   if (fromUser) {
+    if (m.defaultPair) {
+      params.pair = getPair(m.defaultPair).id;
+      params.invert = false;
+    }
     if (m.style && (STYLES as readonly string[]).includes(m.style)) {
       params.style = m.style as Style;
       styleSeg.set(params.style);
@@ -926,8 +973,24 @@ segmented(frameBody, Object.keys(FRAMES) as FrameKey[], params.frame, (v) => {
 });
 
 const colourBody = section(right, 'Colour');
+const pairSwatches = el('div', { class: 'pair-swatches' });
+const pairLabel = el('span', { class: 'pair-label' });
+const skipPair = el('button', { class: 'btn small', type: 'button', title: 'Next locked pair' }, 'Skip pair');
+const invertPair = el('button', { class: 'btn small', type: 'button', title: 'Swap field and figure' }, 'Invert');
+colourBody.append(el('div', { class: 'pair-row' }, pairSwatches, pairLabel, el('span', { class: 'pair-actions' }, skipPair, invertPair)));
+skipPair.addEventListener('click', () => {
+  params.pair = nextPair(params.pair).id;
+  onModeVisualsChanged();
+  save();
+});
+invertPair.addEventListener('click', () => {
+  params.invert = !params.invert;
+  onModeVisualsChanged();
+  save();
+});
+const fullPaletteBox = el('div', { class: 'section-body' });
 const tabSeg = segmented<Tab>(
-  colourBody,
+  fullPaletteBox,
   [
     { value: 'photo', label: 'Photo' },
     { value: 'brand', label: BRAND_NAME },
@@ -940,17 +1003,33 @@ const tabSeg = segmented<Tab>(
   },
 );
 const swatches = el('div', { class: 'swatches' });
-colourBody.append(swatches);
-const presetSeg = segmented<PresetName | ''>(colourBody, PRESET_NAMES, params.preset[params.tab] ?? '', (v) => {
+fullPaletteBox.append(swatches);
+colourBody.append(fullPaletteBox);
+const presetSeg = segmented<PresetName | ''>(fullPaletteBox, PRESET_NAMES, params.preset[params.tab] ?? '', (v) => {
   if (!v) return;
   params.preset[params.tab] = v;
   params.active[params.tab] = null;
   renderColour();
   save();
 }, 'flat');
-numSlider(colourBody, 'brandMix', 'Brand mix', 0, 1, 0.01, 2);
+numSlider(fullPaletteBox, 'brandMix', 'Brand mix', 0, 1, 0.01, 2);
+const lockedNote = el('p', { class: 'note' }, 'Two inks only: Brand mix is fixed at 1. Turn on the full palette under Mode to use photo colours.');
+colourBody.append(lockedNote);
 
 function renderColour(): void {
+  const ink = inks();
+  pairSwatches.replaceChildren(
+    ...[ink.field, ink.figure].map((c, i) => {
+      const sw = el('span', { class: 'swatch', title: `${i ? 'Figure' : 'Field'} ${rgbToHex(c)}` });
+      sw.style.background = rgbToHex(c);
+      return sw;
+    }),
+  );
+  pairLabel.replaceChildren(ink.label + (params.invert ? ' · inverted' : ''), ...(ink.unlocked ? [el('em', {}, ' · fuera de pares locked')] : []));
+  skipPair.disabled = ink.unlocked;
+  const locked = lockedPalette();
+  fullPaletteBox.hidden = locked;
+  lockedNote.hidden = !locked || !isBase();
   tabSeg.set(params.tab);
   presetSeg.set(params.active[params.tab] ? '' : (params.preset[params.tab] ?? 'Full'));
   const pal = palette();

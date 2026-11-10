@@ -1,10 +1,11 @@
-export const BRAND_FONT = 'AerosolBrand';
-const BRAND_FONT_URL = 'fonts/outfit-latin-700-normal.woff2';
+/** Todo type sobre el canvas va en Archivo Narrow (variable 400–700). */
+export const BRAND_FONT = 'Archivo Narrow Canvas';
+const BRAND_FONT_URL = 'fonts/archivo-narrow-latin-wght-normal.woff2';
 
 /** Carga la fuente de marca desde public/fonts. Si falla, el texto usa una sans del sistema. */
 export async function loadBrandFont(): Promise<boolean> {
   try {
-    const face = new FontFace(BRAND_FONT, `url(${BRAND_FONT_URL})`, { weight: '700' });
+    const face = new FontFace(BRAND_FONT, `url(${BRAND_FONT_URL})`, { weight: '400 700' });
     await face.load();
     document.fonts.add(face);
     return true;
@@ -34,7 +35,7 @@ export function drawText(c: HTMLCanvasElement, w: number, h: number, p: TextPara
   const lines = p.text.split('\n').map((l) => l.trimEnd());
   if (!lines.some((l) => l.trim())) return false;
   const px = Math.min(w, h * 1.1) * p.size;
-  ctx.font = `700 ${px}px ${BRAND_FONT}, "Helvetica Neue", Arial, sans-serif`;
+  ctx.font = `700 ${px}px "${BRAND_FONT}", "Arial Narrow", Arial, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#fff';

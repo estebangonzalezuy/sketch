@@ -31,6 +31,8 @@ export interface FrameParams {
   hasText: boolean;
   textEffect: number;
   textColor: RGB;
+  /** Tintas del par activo: el shader reemplaza cualquier azul retirado por la más cercana. */
+  guard: [RGB, RGB];
   airbrush: number;
   saturation: number;
   pale: number;
@@ -334,6 +336,8 @@ export class Renderer {
       gl.uniform1i(u.uInkN, k);
       if (k > 0) gl.uniform3fv(u.uInks, p.inks.slice(0, k).flat());
       gl.uniform3f(u.uRisoPaper, ...p.risoPaper);
+      gl.uniform3f(u.uGuardA, ...p.guard[0]);
+      gl.uniform3f(u.uGuardB, ...p.guard[1]);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
   }

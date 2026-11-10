@@ -1,24 +1,24 @@
 {
-  "name": "Brand",
-  "paper": "#f4efe4",
+  "name": "tMSC",
+  "paper": "#FFFFFF",
   "colors": [
-    { "name": "Bone", "hex": "#f4efe4" },
-    { "name": "Gold", "hex": "#f2c200" },
-    { "name": "Peach", "hex": "#ff9f87" },
-    { "name": "Hot pink", "hex": "#ff2d78" },
-    { "name": "Red", "hex": "#d8261b" },
-    { "name": "Bordeaux", "hex": "#4f1016" },
-    { "name": "Sky", "hex": "#a9c8f5" },
-    { "name": "Cobalt", "hex": "#1f3fd6" },
-    { "name": "Navy", "hex": "#14204a" },
-    { "name": "Forest", "hex": "#0f2a26" }
+    { "name": "White", "hex": "#FFFFFF" },
+    { "name": "Ink", "hex": "#0C0C0C" },
+    { "name": "Acid", "hex": "#E4FC24" },
+    { "name": "Lilac", "hex": "#CC84FC" },
+    { "name": "Brown", "hex": "#3C240C" },
+    { "name": "Magenta", "hex": "#F06CCC" },
+    { "name": "Verde", "hex": "#0C540C" },
+    { "name": "Signal orange (unlocked)", "hex": "#FC540C" },
+    { "name": "Gold (unlocked)", "hex": "#FCB400" },
+    { "name": "Cream paper (unlocked)", "hex": "#F2EEE6" }
   ],
   "presets": {
     "Full": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    "Primary": [0, 1, 3, 5, 8],
-    "Duo": [1, 8],
-    "Warm": [0, 1, 2, 3, 4, 5],
-    "Cool": [0, 6, 7, 8, 9]
+    "Primary": [0, 1, 2, 7],
+    "Duo": [1, 2],
+    "Warm": [1, 9, 7, 8, 5],
+    "Cool": [0, 1, 3, 6]
   },
-  "text": 5
+  "text": 1
 }

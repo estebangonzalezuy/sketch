@@ -171,7 +171,17 @@ uniform int uPalN;
 uniform vec3 uInks[3];
 uniform int uInkN;
 uniform vec3 uRisoPaper;
+uniform vec3 uGuardA;
+uniform vec3 uGuardB;
 ${NOISE}
+
+// #0000FF y #3D3DEB están retirados: ningún píxel del preview o del export puede acercarse.
+vec3 guardBlue(vec3 c) {
+  if (distance(c, vec3(0.0, 0.0, 1.0)) < 0.12 || distance(c, vec3(0.239, 0.239, 0.922)) < 0.12) {
+    return distance(c, uGuardA) < distance(c, uGuardB) ? uGuardA : uGuardB;
+  }
+  return c;
+}
 
 vec4 smp(vec2 uv) {
   // textureLod 0: con Pixel o Glass las coordenadas saltan entre píxeles vecinos y el muestreo
@@ -323,5 +333,5 @@ void main() {
   }
   // Brillo y sombra sutiles en los bordes de cada estría.
   col += rib * 0.05;
-  outColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+  outColor = vec4(guardBlue(clamp(col, 0.0, 1.0)), 1.0);
 }`;
