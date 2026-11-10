@@ -14,9 +14,26 @@ npm run build    # tsc + vite build en dist/
 npm test         # tests de la línea de tiempo y la paleta
 ```
 
-- **Espacio** pausa. Doble clic en el valor de un slider lo vuelve al valor por defecto.
+- **Espacio** pausa. **PNG** guarda el frame del hold (still first); **Export** el MP4 del loop. Doble clic en el valor de un slider lo vuelve al valor por defecto.
 - Arrastrá fotos o videos a cualquier parte de la ventana. La lista de Media se reordena arrastrando y se reproduce de arriba hacia abajo; clic en una fila salta a esa media.
 - Los parámetros se guardan en `localStorage`.
+
+## Modos
+
+Selector arriba a la derecha, agrupado en un registro compartido (`src/modes/*.json`, uno por modo; ver `docs/MOODBOARD-MODES-NOTES.md`):
+
+- **Base · Photo spray:** la tool de siempre (media, morph, texto, smear), descrita en "Panel".
+- **Figma Q3:** grupo vacío en este repo, listo para los modos del brief Q3.
+- **Moodboard** (base Notion "tMSC — Universo visual"): A Una Palabra, B Dato Grande, C Cruce, D Campo Partido, E Grano de Papel, F Órbita, G Dither Field (Propuesta). Cada uno es un preset completo con loop de 2 s (intro + Hold), su par default y su panel de diales. Los diales que reusan un parámetro existente (Grain, Airbrush, Pale ground, Matrix, Cell) mueven el mismo slider de Paint.
+
+**Save preset / Load preset** guardan y cargan un JSON con modo + flags + diales + texto. El panel del modo muestra el status (Aprobada / Propuesta) y el porcentaje de campo vacío del hold contra el mínimo del brief (≥70 % en A, C y E).
+
+## Color: pares locked
+
+Toda pieza usa 2 tintas de uno de estos pares (campo + figura): ink/white `#FFFFFF` + `#0C0C0C`, acid/ink `#E4FC24` + `#0C0C0C`, lilac/brown `#CC84FC` + `#3C240C`, magenta/verde `#F06CCC` + `#0C540C`. Al cargar se sortea uno; **Skip pair** pasa al siguiente e **Invert** cambia campo y figura. Abrir un modo aplica su par default.
+
+- Lo que no es par locked (naranja señal, gold, papel crema, la paleta completa y los colores de la foto en Base) existe solo como flag "fuera de pares locked", off por default y marcado en el panel.
+- `#0000FF` y `#3D3DEB` están retirados: los tests revisan pares y paleta, todo color que va al shader pasa por una guarda y el shader final reemplaza cualquier píxel cercano a esos azules por la tinta más cercana del par.
 
 ## Panel
 
@@ -28,7 +45,7 @@ npm test         # tests de la línea de tiempo y la paleta
 
 **Frame.** 3:2, 1:1, 4:5, 9:16, 16:9. 720p y 1080p se refieren al lado corto (1080p en 4:5 = 1080×1350).
 
-**Colour.** Pestaña Photo (paleta de 8 colores sacada de todas las medias con k-means) o Brand (`src/palette.json`). Clic en un swatch lo activa o lo saca. Presets Full, Primary, Duo, Warm, Cool. Brand mix: 0 = colores de la foto posterizados, 1 = todo llevado a la paleta.
+**Colour.** El par activo con Skip pair e Invert. Con el flag de paleta completa (modo Base): pestaña Photo (paleta de 8 colores sacada de todas las medias con k-means) o Brand (`src/palette.json`), presets Full, Primary, Duo, Warm, Cool y Brand mix (0 = colores de la foto posterizados, 1 = todo llevado a la paleta). Sin el flag, Brand mix queda en 1.
 
 **Paint.**
 
@@ -38,6 +55,7 @@ npm test         # tests de la línea de tiempo y la paleta
   - **Riso:** hasta 3 tintas multiplicadas sobre el papel, con el registro corrido y grano por tinta. El papel es el color más claro activo; las tintas, el más oscuro y los más saturados.
   - **Pixel:** mosaico con dither ordenado Bayer 8×8.
   - **Lines:** trama de líneas onduladas, tipo grabado.
+  - **Stipple:** dither de 1 bit entre las dos tintas, con matriz Bayer 8×8 o blue noise 64×64 (void-and-cluster, generado al arrancar) y celda configurable. La densidad de puntos es el dato.
 - Flatten (niveles de posterizado), Airbrush (radio del blur), Grain (intensidad; en Dots, Pixel y Lines también el tamaño de la trama), Saturation, Pale ground (aclara hacia el papel), Boil (velocidad del hervor: la semilla del ruido cambia 24 × Boil veces por segundo; 0 = quieto).
 
 **Effects.** Se apilan sobre cualquier estilo:
@@ -66,21 +84,9 @@ Render offline frame a frame a 30 fps: cada video se posiciona con `seeked` ante
 
 ## Paleta y fuente
 
-`src/palette.json`:
+`src/palette.json` es la paleta completa (solo con el flag): las tintas tMSC más los campos no locked. `name` es la etiqueta de la pestaña, `paper` el color hacia el que aclara Pale ground, `presets` usa índices de `colors` y `text` es el color de texto por defecto.
 
-```json
-{
-  "name": "Brand",
-  "paper": "#f4efe4",
-  "colors": [{ "name": "Bone", "hex": "#f4efe4" }, ...],
-  "presets": { "Full": [0, 1, ...], "Primary": [...], "Duo": [...], "Warm": [...], "Cool": [...] },
-  "text": 5
-}
-```
-
-`name` es la etiqueta de la pestaña, `paper` el color hacia el que aclara Pale ground, `presets` usa índices de `colors` (los que falten se calculan solos) y `text` es el color de texto por defecto. Hay lugar para 16 colores. La paleta que viene es de ejemplo (azul marino, cobalto, rosa fuerte, amarillo, hueso, rojo, bordó…): reemplazala por la tuya.
-
-La fuente de marca se carga desde `public/fonts/outfit-latin-700-normal.woff2` (Outfit Bold, OFL). Para usar otra, copiá el `.woff2` a `public/fonts/` y cambiá `BRAND_FONT_URL` en `src/text.ts`. La UI usa Geist (OFL).
+Toda la UI y todo el type sobre el canvas usan Archivo Narrow (variable 400–700, OFL), desde `public/fonts/archivo-narrow-latin-wght-normal.woff2`.
 
 ## Límites
 
