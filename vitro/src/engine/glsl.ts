@@ -425,7 +425,16 @@ uniform float uStep, uSigma;
 void main(){
   ivec2 px = ivec2(gl_FragCoord.xy); ivec2 sz = textureSize(uColor, 0);
   vec4 c0 = texelFetch(uColor, px, 0); vec4 g0 = texelFetch(uGuide, px, 0);
-  float l0 = dot(c0.rgb, vec3(0.3, 0.5, 0.2));
+  // la referencia de color es el promedio 3x3, no el píxel central: así un píxel atípico
+  // (muy oscuro o muy brillante) no se protege a sí mismo y el filtro lo absorbe
+  vec3 m0 = vec3(0.0);
+  for(int y = -1; y <= 1; y++) for(int x = -1; x <= 1; x++) m0 += texelFetch(uColor, clamp(px + ivec2(x, y), ivec2(0), sz - 1), 0).rgb;
+  float l0 = dot(m0 / 9.0, vec3(0.3, 0.5, 0.2));
+  // gradiente de profundidad en pantalla: en superficies rasantes (un piso) la profundidad cambia
+  // mucho de un píxel al otro y sin esto el filtro las trataría como bordes
+  vec2 gz = 0.5 * vec2(
+    texelFetch(uGuide, min(px + ivec2(1, 0), sz - 1), 0).w - texelFetch(uGuide, max(px - ivec2(1, 0), ivec2(0)), 0).w,
+    texelFetch(uGuide, min(px + ivec2(0, 1), sz - 1), 0).w - texelFetch(uGuide, max(px - ivec2(0, 1), ivec2(0)), 0).w);
   vec3 sum = vec3(0.0); float ws = 0.0;
   const float k[3] = float[3](0.375, 0.25, 0.0625);
   for(int y = -2; y <= 2; y++) for(int x = -2; x <= 2; x++){
@@ -433,7 +442,8 @@ void main(){
     vec4 c = texelFetch(uColor, q, 0); vec4 g = texelFetch(uGuide, q, 0);
     float wn = pow(max(dot(g.xyz, g0.xyz), 0.0), 48.0);
     if(dot(g0.xyz, g0.xyz) < 0.25) wn = dot(g.xyz, g.xyz) < 0.25 ? 1.0 : 0.0;
-    float wz = exp(-abs(g.w - g0.w) / (0.02 * (1.0 + g0.w)));
+    vec2 off = vec2(float(x), float(y)) * uStep;
+    float wz = exp(-abs(g.w - g0.w - dot(gz, off)) / (0.02 * (1.0 + g0.w) + 0.5 * abs(dot(gz, off))));
     float dl = dot(c.rgb, vec3(0.3, 0.5, 0.2)) - l0;
     float wc = exp(-dl * dl / (uSigma * uSigma * (0.02 + l0 * l0)));
     float w = k[abs(x)] * k[abs(y)] * wn * wz * wc;

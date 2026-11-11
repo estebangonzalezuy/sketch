@@ -55,7 +55,7 @@ Cada feature con una nota, su tamaño (S, M, L) y su estado: hecha, descartada o
 | --- | --- | --- | --- |
 | Keyframes por parámetro | Rotación, posición, escala, morph, luces y cámara | M | hecha |
 | Loop perfecto | La última clave vuelve a la primera; el cuadro final no repite el inicial | S | hecha |
-| Easing editable por clave | Curva bézier en el panel y seis curvas rápidas | S | hecha |
+| Easing editable por clave | Curva bézier en el panel de la clave | S | hecha |
 | Timeline mínima | Scrub, claves arrastrables, doble clic para crear, clave automática al editar | M | hecha |
 | PNG en alta resolución | Hasta 2× del formato, con muestras a elección | S | hecha |
 | MP4 cuadro por cuadro | WebCodecs H.264 y, si falta, ffmpeg.wasm | M | hecha |

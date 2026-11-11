@@ -81,7 +81,7 @@ function toro(): Scene {
   return scene({
     name: 'Toro de vidrio', palette: { pair: 1, invert: false },
     layers: [t, c, ...studio(0.9), hdri({ preset: 'anillo', intensity: 0.7, tint: 0.8 }), backdrop()],
-    camera: camera({ azimuth: 0, polar: 82, distance: 10.5, focal: 60 }),
+    camera: camera({ azimuth: 0, polar: 82, distance: 15, focal: 60 }),
     anim: { duration: 4, fps: 30, tracks: [track(t.id, 'rotation.0', [[0, 28], [1, 388]]), sway(c.id, 'scale', 1, 1.25)] },
   })
 }

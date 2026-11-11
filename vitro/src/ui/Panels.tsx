@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useRef } from 'react'
 import { useDialKitController } from 'dialkit'
-import { EASES, getPath, propLabel, resolveScene } from '../scene/animate'
+import { getPath, propLabel, resolveScene } from '../scene/animate'
 import { MATERIALS, MATERIAL_NAMES } from '../scene/materials'
 import { PAIRS } from '../scene/palettes'
 import { FORMATS, isShape, KIND_LABEL, type Ease, type Layer, type Scene } from '../scene/types'
@@ -172,7 +172,6 @@ function KeyPanel({ scene, trackId, index }: { scene: Scene; trackId: string; in
   const span = scene.anim.duration * ((tr.keys[index + 1]?.t ?? 1 + tr.keys[0].t) - key.t)
   const dial = useBinding(`Clave · ${label}`, `key-${trackId}-${index}`, groups, key, (_p, v) => patchKey(trackId, index, { v }), {
     eliminarClave: () => removeKey(trackId, index),
-    ...Object.fromEntries(Object.entries(EASES).map(([n, e]) => [`curva${n}`, () => patchKey(trackId, index, { ease: e })])),
   }, { curva: { type: 'easing', duration: Math.max(0.05, span), ease: key.ease } })
   // la curva editable del panel -> easing de la clave
   const ease = (dial.values as any).curva?.ease as Ease | undefined
