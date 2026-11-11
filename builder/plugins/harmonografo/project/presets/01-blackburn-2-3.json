@@ -1,0 +1,29 @@
+{
+  "tEnd": 600,
+  "cutoff": 0.04,
+  "penWidth": 1.2,
+  "drawSeconds": 10,
+  "holdSeconds": 2,
+  "timeMode": "fisico",
+  "palette": 0,
+  "invert": false,
+  "caption": true,
+  "margin": 0.08,
+  "name": "blackburn 2:3",
+  "pendulums": [
+    {
+      "axis": "x",
+      "freq": 2,
+      "phase": 0,
+      "amp": 1,
+      "damp": 0.004
+    },
+    {
+      "axis": "y",
+      "freq": 3.006,
+      "phase": 1.57,
+      "amp": 1,
+      "damp": 0.004
+    }
+  ]
+}

@@ -5,3 +5,4 @@ dist
 .vercel
 src/data/studios.json
 src/data/facets.json
+builder/corpus/esteban-mensajes.txt

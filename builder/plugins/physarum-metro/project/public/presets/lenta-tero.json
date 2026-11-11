@@ -1,0 +1,20 @@
+{
+ "_nota": "Sensor largo y giro chico: busca conexiones lejanas, crece lento (evoca la placa de Tero; no es su modelo de flujo).",
+ "agents": 250000,
+ "sensorAngle": 15,
+ "turnAngle": 20,
+ "sensorDist": 22,
+ "stepSize": 0.8,
+ "deposit": 5,
+ "decay": 0.08,
+ "diffuse": 1,
+ "food": 30,
+ "foodRadius": 2.5,
+ "spawn": "estaciones",
+ "spawnRadius": 3,
+ "stepsPerFrame": 4,
+ "expo": 14,
+ "gamma": 1,
+ "cell": 2,
+ "respawn": 0.001
+}

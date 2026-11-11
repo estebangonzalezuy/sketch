@@ -1,0 +1,20 @@
+{
+ "_nota": "Parámetros base del paper de Jones (SA 22.5°, RA 45°, SO 9, SS 1, decaimiento 0.1). No ajustados mirando la red real.",
+ "agents": 200000,
+ "sensorAngle": 22.5,
+ "turnAngle": 45,
+ "sensorDist": 9,
+ "stepSize": 1,
+ "deposit": 5,
+ "decay": 0.1,
+ "diffuse": 1,
+ "food": 20,
+ "foodRadius": 2.5,
+ "spawn": "estaciones",
+ "spawnRadius": 4,
+ "stepsPerFrame": 3,
+ "expo": 12,
+ "gamma": 1,
+ "cell": 2,
+ "respawn": 0.001
+}

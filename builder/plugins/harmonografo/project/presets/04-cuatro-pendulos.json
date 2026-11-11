@@ -1,0 +1,43 @@
+{
+  "tEnd": 600,
+  "cutoff": 0.04,
+  "penWidth": 1.2,
+  "drawSeconds": 10,
+  "holdSeconds": 2,
+  "timeMode": "fisico",
+  "palette": 3,
+  "invert": false,
+  "caption": true,
+  "margin": 0.08,
+  "name": "cuatro péndulos",
+  "pendulums": [
+    {
+      "axis": "x",
+      "freq": 2.01,
+      "phase": 0,
+      "amp": 1,
+      "damp": 0.0035
+    },
+    {
+      "axis": "x",
+      "freq": 3,
+      "phase": 1.1,
+      "amp": 0.6,
+      "damp": 0.0045
+    },
+    {
+      "axis": "y",
+      "freq": 3,
+      "phase": 0.4,
+      "amp": 1,
+      "damp": 0.003
+    },
+    {
+      "axis": "y",
+      "freq": 2,
+      "phase": 2.3,
+      "amp": 0.6,
+      "damp": 0.0055
+    }
+  ]
+}

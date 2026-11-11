@@ -1,0 +1,36 @@
+{
+  "tEnd": 600,
+  "cutoff": 0.04,
+  "penWidth": 1,
+  "drawSeconds": 10,
+  "holdSeconds": 2,
+  "timeMode": "fisico",
+  "palette": 2,
+  "invert": false,
+  "caption": true,
+  "margin": 0.08,
+  "name": "unísono casi",
+  "pendulums": [
+    {
+      "axis": "x",
+      "freq": 2,
+      "phase": 0,
+      "amp": 1,
+      "damp": 0.0022
+    },
+    {
+      "axis": "y",
+      "freq": 2.004,
+      "phase": 1.2,
+      "amp": 1,
+      "damp": 0.0022
+    },
+    {
+      "axis": "x",
+      "freq": 6,
+      "phase": 0.3,
+      "amp": 0.25,
+      "damp": 0.006
+    }
+  ]
+}

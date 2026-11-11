@@ -1,0 +1,20 @@
+import { chromium } from "playwright-core";
+import { writeFile } from "node:fs/promises";
+const [,, city = "barcelona", frames = "120", out = "/tmp/probe.jpg", presetJson = "{}"] = process.argv;
+const b = await chromium.launch({ headless: true, executablePath: "/usr/bin/google-chrome", args: ["--no-sandbox", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
+const p = await b.newPage({ viewport: { width: 1400, height: 1000 } });
+p.on("pageerror", (e) => console.log("pageerror", e.message));
+p.on("console", (m) => { if (m.type() === "error") console.log("console", m.text()); });
+await p.goto("http://127.0.0.1:5197/", { waitUntil: "networkidle" });
+await p.waitForFunction(() => window.__physarum && window.__physarum.ready(), null, { timeout: 60000 });
+const t0 = Date.now();
+await p.evaluate(async ([c, pj]) => window.__physarum.apply({ city: c, ...JSON.parse(pj) }), [city, presetJson]);
+const n = Number(frames); let done = 0;
+while (done < n) { const k = Math.min(30, n - done); await p.evaluate((k) => window.__physarum.frames(k), k); done += k; }
+const t1 = Date.now();
+const m = await p.evaluate(() => window.__physarum.measure());
+const info = await p.evaluate(() => window.__physarum.city());
+console.log(JSON.stringify({ simMsPerFrame: (t1 - t0) / n, metric: m, info: { ...info, counts: undefined } }));
+const d = await p.evaluate(() => window.__physarum.jpeg(0.9));
+await writeFile(out, Buffer.from(d.split(",")[1], "base64"));
+await b.close();
