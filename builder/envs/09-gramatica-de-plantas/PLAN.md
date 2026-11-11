@@ -37,3 +37,14 @@ Antes de cualquier cambio que toque este entorno o el core, verificá que siga v
 
 ## Si un bug sobrevive dos arreglos (paso 6)
 Parar. Anotar en `PROCESS.md` qué se intentó, por qué falló el enfoque y proponer rehacer la parte (no un tercer parche).
+
+---
+
+## Decisiones de Claude Code (fase 3) — 11/11/2026
+- **A+B confirmada.** Tabla fija letra → fragmento (`TABLA` en `src/envs/gramatica-de-plantas/index.ts`, legible para el video: + gira a la izquierda, − a la derecha, [ ] abre rama). Axioma X; X → F + fragmentos de cada letra + X; F → FF. Tildes y Ñ se normalizan (Á→A, Ñ→N); lo que no es letra se ignora.
+- **Hash** (FNV-1a de la palabra) mueve el ángulo ±4°; la `variación` jitterea cada giro con la semilla.
+- **Validación visible**, arriba debajo de la regla: sin ramas → se agrega [+X][−X]; ramas de un solo lado → se agrega la del otro; expansión > 120 k símbolos → se recorta la profundidad ("profundidad recortada a N"). La regla mostrada es exactamente la que creció.
+- Escala al bounding box con margen; la palabra abajo.
+- Crece en `segundos`, sostiene 1,5 s, se poda en reversa en la mitad del tiempo: loop exacto.
+- `afinar`: grosor por nivel de anidamiento (tronco grueso, puntas finas).
+- Probado con ESTEBAN (profundidad recortada a 4), ANA y X (con [−X] agregado): ninguna es palo ni mancha.
