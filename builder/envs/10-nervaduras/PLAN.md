@@ -46,3 +46,4 @@ Parar. Anotar en `PROCESS.md` qué se intentó, por qué falló el enfoque y pro
 - Grosor = grosorBase · (flujo/flujoRaíz)^(1/exponente), flujo = cantidad de nodos aguas abajo: monótono hacia la raíz.
 - Loop: crece en 9 s/velocidad, sostiene 1,5 s y corta (`loop: "cut"`).
 - Los radios y el paso están en px a 1080 y escalan con el lado corto.
+- **Capa de tinta** (`src/core/ink.ts`): las venas se dibujan en varias pasadas (una por grosor) sobre una capa de solo alfa que se compone una vez con fg. Dibujadas directo, el antialiasing superpuesto se iba hasta 4,6 niveles de la recta bg–fg en el par ácido invertido; con la capa, 1,6.

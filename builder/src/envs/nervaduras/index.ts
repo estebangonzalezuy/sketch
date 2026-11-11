@@ -4,6 +4,7 @@
 // crecen hacia las auxinas activas. Las venas nunca salen de la máscara. Grosor por modelo de tubería.
 import type { Env, EnvContext } from "../../core/env";
 import { font } from "../../core/fonts";
+import { inkLayer } from "../../core/ink";
 import { mulberry32 } from "../../core/rng";
 import { params, type NervadurasParams as P } from "./params";
 import { presets } from "./presets";
@@ -240,16 +241,18 @@ function draw(g: CanvasRenderingContext2D, p: P, ctx: EnvContext) {
     if (b) b.push(i);
     else groups.set(q, [i]);
   }
-  g.lineCap = "round";
-  for (const [q, list] of groups) {
-    g.lineWidth = q;
-    g.beginPath();
-    for (const i of list) {
-      g.moveTo(nx[par[i]], ny[par[i]]);
-      g.lineTo(nx[i], ny[i]);
+  inkLayer(g, palette.fg, (ink) => {
+    ink.lineCap = "round";
+    for (const [q, list] of groups) {
+      ink.lineWidth = q;
+      ink.beginPath();
+      for (const i of list) {
+        ink.moveTo(nx[par[i]], ny[par[i]]);
+        ink.lineTo(nx[i], ny[i]);
+      }
+      ink.stroke();
     }
-    g.stroke();
-  }
+  });
 }
 
 function svg(p: P, ctx: EnvContext) {
