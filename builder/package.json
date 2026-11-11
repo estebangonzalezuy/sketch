@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test": "node tests/run.mjs && node tests/keys.mjs",
+    "test": "node tests/run.mjs && node tests/keys.mjs && node tests/polirritmo.mjs",
     "render": "node scripts/render.mjs",
     "sheet": "node scripts/sheet.mjs",
     "reel": "node scripts/reel.mjs"

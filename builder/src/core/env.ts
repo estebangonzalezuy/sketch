@@ -81,6 +81,12 @@ export interface Env<P = any> {
   onPointer?: (e: { x: number; y: number; type: "down" | "move" | "up" }, p: P) => void;
   /** fuente del dato, para el status y el canvas */
   source?: string;
+  /**
+   * Eventos en vivo (audio, MIDI): el runtime lo llama durante la reproducción de la preview con la
+   * ventana de tiempo del entorno [from, to) que hay que agendar, y `now` = t del entorno ahora.
+   * Los tiempos de los eventos se calculan analíticamente; nunca se llama en el export.
+   */
+  schedule?: (from: number, to: number, now: number, p: P) => void;
 }
 
 export const FPS = 30;

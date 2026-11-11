@@ -19,7 +19,7 @@ export const ENVS: EnvEntry[] = [
   { num: "05", id: "superilla", title: "superilla" },
   { num: "06", id: "bifurcacion", title: "bifurcación", load: () => import("./bifurcacion") },
   { num: "07", id: "atractor", title: "atractor", load: () => import("./atractor") },
-  { num: "08", id: "polirritmo", title: "polirritmo" },
+  { num: "08", id: "polirritmo", title: "polirritmo", load: () => import("./polirritmo") },
   { num: "09", id: "gramatica-de-plantas", title: "gramática de plantas", load: () => import("./gramatica-de-plantas") },
   { num: "10", id: "nervaduras", title: "nervaduras", load: () => import("./nervaduras") },
   { num: "11", id: "metros-por-sueldo", title: "metros por sueldo" },
