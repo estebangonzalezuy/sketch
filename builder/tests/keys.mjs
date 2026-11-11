@@ -49,7 +49,7 @@ try {
 
   // un slider de DialKit con teclado → runtime
   const a0 = (await pr()).params.d;
-  const slider = page.locator(".dialkit-root [role=slider]").nth(3);
+  const slider = page.locator(".dialkit-root [role=slider]").nth(4); // 0 = semilla (panel builder), 1–4 = a b c d
   await slider.focus();
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("ArrowRight");
@@ -69,6 +69,7 @@ try {
   await page.waitForFunction(() => window.__builder.state().envId === "atractor");
   ok("[ vuelve al anterior", true, "atractor");
 
+  await page.click(".stage");
   // pausado, para que la preview no avance t entre la tecla y la lectura
   if ((await st()).playing) await page.keyboard.press(" ");
   await page.waitForTimeout(300);
@@ -76,12 +77,26 @@ try {
   ok("0 vuelve a t = 0", (await st()).t === 0, `t = ${(await st()).t}`);
   await page.keyboard.press(" ");
 
+  await page.click(".stage"); // foco fuera de DialKit (con foco adentro los atajos se ignoran a propósito)
   const dl = page.waitForEvent("download", { timeout: 10000 });
   await page.keyboard.press("s");
   const d = await dl;
   ok("s descarga png", d.suggestedFilename().endsWith(".png"), d.suggestedFilename());
 
-  ok("la url refleja el estado", (await page.evaluate(() => location.search)).includes("env=atractor"));
+  // el select "Entorno" del panel builder (DialKit) cambia de entorno
+  await page.evaluate(() => {
+    const t = [...document.querySelectorAll(".dialkit-root button, .dialkit-root [role=combobox]")].find((b) => b.textContent.includes("atractor"));
+    t?.click();
+  });
+  await page.waitForTimeout(300);
+  const opt = page.locator(".dialkit-root [role=option], .dialkit-select-option").filter({ hasText: "superilla" }).first();
+  if (await opt.count()) {
+    await opt.click();
+    await page.waitForFunction(() => window.__builder.state().envId === "superilla", null, { timeout: 5000 }).catch(() => {});
+  }
+  ok("select Entorno de DialKit cambia el entorno", (await st()).envId === "superilla", (await st()).envId);
+
+  ok("la url refleja el estado", (await page.evaluate(() => location.search)).includes(`env=${(await st()).envId}`));
   ok("sin errores de página", errors.length === 0, errors.join(" | "));
 } finally {
   await browser.close();
