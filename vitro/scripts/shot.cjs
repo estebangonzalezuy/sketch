@@ -1,0 +1,16 @@
+// Uso: node scripts/shot.mjs <url> <salida.png> [timeoutMs]
+const { chromium } = require('playwright')
+const [url, out, to = '600000'] = process.argv.slice(2)
+;(async () => {
+const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] })
+const p = await b.newPage({ viewport: { width: 1440, height: 900 } })
+p.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') console.log('[' + m.type() + ']', m.text().slice(0, 1500)) })
+p.on('pageerror', (e) => console.log('[pageerror]', e.message))
+const T=Date.now(); const lg=(m)=>console.log(((Date.now()-T)/1000).toFixed(1)+'s', m)
+await p.goto(url); lg('loaded')
+await p.waitForFunction('window.__done === true', null, { timeout: Number(to), polling: 500 }); lg('done')
+console.log('ms', await p.evaluate('window.__ms'), 'spp', await p.evaluate('window.__samples'))
+const d = await p.evaluate("document.querySelector('canvas').toDataURL('image/png')")
+require('fs').writeFileSync(out, Buffer.from(d.split(',')[1], 'base64'))
+lg('saved'); await b.close()
+})()

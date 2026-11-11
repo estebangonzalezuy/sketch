@@ -9,6 +9,6 @@ export default defineConfig({
   base: BASE,
   build: { target: 'es2022', cssCodeSplit: false, outDir: `dist${BASE}`, emptyOutDir: true },
   test: {
-    exclude: [...configDefaults.exclude, 'motion-builder/**', 'anticipator/**'],
+    exclude: [...configDefaults.exclude, 'motion-builder/**', 'anticipator/**', 'vitro/**'],
   },
 });

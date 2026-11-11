@@ -74,6 +74,14 @@ const SKETCHES: Sketch[] = [
     build: 'vite',
     dir: 'builder',
   },
+  {
+    slug: 'vitro',
+    name: 'Vitro',
+    what: 'Editor 3D por capas: vidrio, metal líquido y formas líquidas con path tracing progresivo. Exporta PNG y loops en MP4.',
+    stack: 'Vite · React · three · DialKit',
+    build: 'vite',
+    dir: 'vitro',
+  },
 ];
 
 const run = (cmd: string, cwd: string) => execSync(cmd, { cwd, stdio: 'inherit' });
