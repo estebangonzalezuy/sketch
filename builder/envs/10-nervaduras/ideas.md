@@ -6,8 +6,8 @@ Paso 4 de Szymon. Todo lo que aparezca fuera de alcance va acá, no al código. 
 
 | Idea | Nota | Tamaño | Estado |
 |---|---|---|---|
-| Versión 1 del entorno | Colonización del espacio (Runions et al. 2005): venas que crecen hacia puntos de auxina dentro del contorno de una letra. | M | después |
+| Versión 1 del entorno | Colonización del espacio (Runions et al. 2005): venas que crecen hacia puntos de auxina dentro del contorno de una letra. | M | hecha (11/11) |
 | Palabra entera (una raíz por letra) |  | M | después |
 | Auxinas por Poisson disk |  | S | después |
 | Venación cerrada (loops, modelo 'closed') |  | M | después |
-| Presets curados (3 a 6) | Cada preset es un loop mostrable para IG/X | S | después |
+| Presets curados (3 a 6) | 5 en `src/envs/nervaduras/presets.ts` | S | hecha |
