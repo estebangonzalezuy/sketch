@@ -39,3 +39,14 @@ Antes de cualquier cambio que toque este entorno o el core, verificá que siga v
 
 ## Si un bug sobrevive dos arreglos (paso 6)
 Parar. Anotar en `PROCESS.md` qué se intentó, por qué falló el enfoque y proponer rehacer la parte (no un tercer parche).
+
+---
+
+## Decisiones de Claude Code (fase 3) — 11/11/2026
+- **B confirmada.** Grafo de tramos (cada uno un array NaSch 1D, `nasch()` con las 4 reglas en orden y PRNG con semilla) + nodos con cola (el coche en la última celda espera), ruteo que evita tramos cerrados y **prioridad a la derecha** cuando dos coches quieren el mismo tramo.
+- Sentidos únicos alternados: horizontales pares al este, impares al oeste; verticales pares al sur, impares al norte. Borde abierto: entran coches con `entrada` por los tramos que vienen de afuera; salen donde la calle termina.
+- **Cierres:** un tramo cerrado no admite coches de afuera; los que ya están en un tramo cerrado pueden seguir por lo cerrado hasta salir (no se borran). Anti-gridlock: tras 10 pasos esperando, el coche puede tomar cualquier salida (incluso cerrada).
+- **Flujo** = salidas por el borde en los últimos 60 pasos (1 paso = 1 s) → coches/min. Medido igual con y sin cierre: 313 → 222 coches/min con la superilla 3×3 (semilla 1842, frame 240).
+- Espacio-tiempo: la calle horizontal del medio, todos sus tramos en orden de marcha, últimos 360 pasos.
+- Rótulo fijo en el canvas: "modelo simplificado (Nagel–Schreckenberg, 1 paso = 1 s); no es el Eixample real".
+- Loop: no es natural; 10 s desde la semilla (`cut`).
