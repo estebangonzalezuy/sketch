@@ -39,3 +39,13 @@ Antes de cualquier cambio que toque este entorno o el core, verificá que siga v
 
 ## Si un bug sobrevive dos arreglos (paso 6)
 Parar. Anotar en `PROCESS.md` qué se intentó, por qué falló el enfoque y proponer rehacer la parte (no un tercer parche).
+
+---
+
+## Decisiones de Claude Code (fase 3) — 11/11/2026
+- **Cambio de enfoque: función del tiempo con retardo, no simulación.** Primero se hizo `reset + step` con inercia y grilla (opción B). El loop no cerraba (43 % de píxeles distintos entre el frame 0 y el T): con rozamiento, las limaduras de campo débil tienen memoria de miles de pasos; cerrar el loop pedía pre-simular 42 s en cada reset. Ahora cada limadura apunta al campo de hace τ (τ = inercia/(1−inercia)/30 s, dividido por el agarre, tope 4 s): la ola de reorientación sigue (τ varía en el espacio) y el loop es exacto (0,00 %).
+- **`fuerza` = rozamiento.** Escalar todos los momentos no cambia la dirección del campo; para que el dial haga algo físico, una limadura gira solo donde |B|·fuerza supera un umbral y, si no, conserva su ángulo inicial.
+- Campo evaluado por limadura (opción A, sin grilla): ~30 k limaduras × 4 imanes × 2 evaluaciones por frame.
+- Loop: la velocidad de giro se ajusta para que 2π cierre en `2π/rotación` s (entre 6 y 60 s); con rotación 0, 10 s.
+- **Arrastre:** reorienta al instante (sin ola) y no reinicia las limaduras; `reiniciar` devuelve los imanes a su lugar. Arrastre con inercia → `ideas.md`.
+- Medido en el contenedor: ≈300 ms/frame con PNG (30 k trazos). No probado en la Mac.
