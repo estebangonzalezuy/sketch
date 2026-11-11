@@ -63,8 +63,8 @@ try {
 
   await page.click(".stage");
   await page.keyboard.press("]");
-  await page.waitForFunction(() => window.__builder.state().envId === "feedback");
-  ok("] pasa al entorno siguiente", true, "feedback");
+  await page.waitForFunction(() => window.__builder.state().envId !== "atractor");
+  ok("] pasa al entorno siguiente", true, (await st()).envId);
   await page.keyboard.press("[");
   await page.waitForFunction(() => window.__builder.state().envId === "atractor");
   ok("[ vuelve al anterior", true, "atractor");

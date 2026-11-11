@@ -50,3 +50,21 @@
 - `E` (descarga del MP4 en la app) se probó por la API (`exportMp4`), no con el diálogo de descarga real.
 - SVG: ninguno de los dos testigos lo tiene; el camino está pero sin probar.
 - Atractor y Feedback se construyeron sin pasar por sus paradas 1 y 2 propias (el maestro los pide en la fase 2); las decisiones quedaron al final de sus `PLAN.md`.
+
+## 11/11/2026 — Claude Code (UI DialKit + fase 3)
+- **18:20** PARADA 3 aprobada. Pedido de Esteban: el shell con la UI de DialKit, "mismos elementos". Barra, switcher, columna de salida y presets ahora usan los componentes de DialKit (`Folder`, `SelectControl`, `Toggle`, `TextControl`, `ButtonGroup`) y sus clases (`dialkit-panel-inner`, `dialkit-segmented`, `dialkit-button`) dentro de un `.dialkit-root` oscuro. La UI usa la tipografía de DialKit; el canvas sigue en Archivo Narrow y 2 colores.
+- **18:25–19:10** Fase 3, un entorno por vez (cada uno: leer su prompt/PLAN, decidir, implementar, still, tests, MP4 10 s, decisiones al final de su `PLAN.md`, `ideas.md`):
+  - **06 Bifurcación** — a la primera. Un test mal planteado (cierre de loop en un loop `cut`): ahora el cierre se exige solo en loops `seamless`.
+  - **15 Anagrama + 16 Multi-anagrama** — motor compartido (`_anagrama/engine.ts`). Correcciones: arcos anclados al centro óptico (salían de la línea base y el tejido quedaba aplastado); preset "tejido" más grande; se sacaron "JAMÓN" (la Ó no es la O), "DERILA" y "SORA" (no son palabras).
+  - **01 Limaduras** — **cambio de enfoque**: con `reset + step` + rozamiento el loop no cerraba (43 %); se rehízo como función de t con retardo dependiente de la inercia y del campo (0,00 %). Arrastrar un imán ahora reorienta sin ola (anotado).
+  - **09 Gramática de Plantas** — la X salía torcida (ramas de un solo lado): validación visible que agrega la rama del otro lado.
+  - **10 Nervaduras** — a la primera; el par ácido invertido daba 4,6 de desvío por AA superpuesto → **capa de tinta** (`src/core/ink.ts`): 1,6.
+  - **08 Polirritmo** — agregado opcional al contrato `Env.schedule` (eventos en vivo con lookahead, nunca en el export); `RhythmBus` con sinks. **Motion Instrument traído a este repo** (copia de `tmsc`, con un listener al final) para que ande en el mismo origen. Test en vivo: intervalos = T/n con 0,0 ms; el broadcast llega; el toggle abre la ventana.
+  - **05 Superilla** — a la primera: flujo 313 → 222 coches/min con la superilla 3×3.
+- **19:12** `npm test` completo en verde (2 min 37 s): 10 entornos × 4 pares × invertido, determinismo, presets, loops, SVG, MP4 WebCodecs, atajos, Polirritmo en vivo.
+
+### Qué no / no probado
+- Nada probado en la Mac de Esteban; los tiempos por frame son de este contenedor (Limaduras ≈300 ms y Atractor ≈190 ms con PNG; el resto < 30 ms).
+- El sonido no se escuchó (headless): se probó que los eventos salen con los tiempos correctos, no el timbre. MIDI sin probar (no hay dispositivos acá).
+- `postMessage` al Motion Instrument publicado en themotionsocial.club: sin probar (dominio bloqueado desde el contenedor); el listener lo acepta.
+- Los entornos de la fase 3 se construyeron sin frenar en sus paradas 1 y 2 propias (Esteban pidió seguir); todas las decisiones están al final de cada `PLAN.md`.
