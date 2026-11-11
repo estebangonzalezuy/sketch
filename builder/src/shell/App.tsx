@@ -1,9 +1,11 @@
+// Shell con la UI de DialKit: sus componentes (Folder, SelectControl, Toggle, TextControl, ButtonGroup)
+// y sus clases (dialkit-panel-inner, dialkit-segmented, dialkit-button) dentro de un .dialkit-root oscuro.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { DialRoot } from "dialkit";
+import { ButtonGroup, DialRoot, Folder, SelectControl, TextControl, Toggle } from "dialkit";
 import type { Runtime } from "../core/runtime";
 import { AVAILABLE, ENVS, entryById } from "../envs";
 import { FORMATS, FORMAT_IDS, type FormatId } from "../core/formats";
-import { pairAt, PAIRS } from "../core/palette";
+import { PAIRS } from "../core/palette";
 import { num } from "../core/fonts";
 import { readUrl, writeUrl } from "./url";
 import { Panel } from "./Panel";
@@ -13,7 +15,9 @@ import { exportMp4Download, exportPng, exportSvg, loadPresetFile, savePresetFile
 export function App({ rt }: { rt: Runtime }) {
   const s = useSyncExternalStore(rt.subscribe, rt.getState);
   const stage = useRef<HTMLDivElement>(null);
+  const file = useRef<HTMLInputElement>(null);
   const [renderMode] = useState(() => readUrl().render);
+  const [seedText, setSeedText] = useState(String(s.seed));
 
   // arranque: estado desde la URL
   useEffect(() => {
@@ -36,6 +40,13 @@ export function App({ rt }: { rt: Runtime }) {
   useEffect(() => {
     if (s.envId) writeUrl({ env: s.envId, seed: s.seed, pair: s.pair, invert: s.invert, fmt: s.fmt });
   }, [s.envId, s.seed, s.pair, s.invert, s.fmt]);
+
+  useEffect(() => setSeedText(String(s.seed)), [s.seed]);
+
+  // el entorno activo siempre a la vista en el switcher
+  useEffect(() => {
+    document.querySelector(`.switcher [data-active="true"]`)?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [s.envId]);
 
   useShortcuts(rt);
 
@@ -61,18 +72,23 @@ export function App({ rt }: { rt: Runtime }) {
     };
   }, [rt]);
 
-  const pal = pairAt(s.pair, s.invert);
   const env = rt.env;
+  const exportButtons = [
+    { label: s.exporting ? `exportando ${Math.round(s.exporting.progress * 100)} %` : "Exportar MP4", onClick: () => void exportMp4Download(rt) },
+    { label: "Exportar PNG", onClick: () => void exportPng(rt) },
+    ...(env?.exports?.svg ? [{ label: "Exportar SVG", onClick: () => exportSvg(rt) }] : []),
+  ];
 
   return (
-    <div className={`shell${renderMode ? " render" : ""}`}>
+    <div className={`shell dialkit-root${renderMode ? " render" : ""}`} data-theme="dark">
       <header className="bar">
         <span className="brand">builder</span>
-        <nav className="switcher">
+        <nav className="switcher dialkit-segmented">
           {ENVS.map((e) => (
             <button
               key={e.id}
-              className={e.id === s.envId ? "on" : ""}
+              className="dialkit-segmented-button"
+              data-active={e.id === s.envId}
               disabled={!e.load}
               title={e.load ? undefined : e.external ? "slot externo: se enchufa cuando el proyecto exponga env.ts" : "en construcción"}
               onClick={() => e.load && e.id !== s.envId && rt.setEnv(e)}
@@ -82,24 +98,11 @@ export function App({ rt }: { rt: Runtime }) {
           ))}
         </nav>
         <div className="tools">
-          <button className="pair" onClick={() => rt.rotatePair()} title="c rota el par · i invierte">
-            <span className="chip" style={{ background: pal.bg, color: pal.fg, borderColor: pal.fg }}>
-              ab
-            </span>
-            {PAIRS[s.pair].name}
+          <button className="dialkit-button" onClick={() => rt.togglePlay()}>
+            {s.playing ? "Pausa" : "Play"}
           </button>
-          <select value={s.fmt} onChange={(e) => rt.setFormat(e.target.value as FormatId)}>
-            {FORMAT_IDS.map((f) => (
-              <option key={f} value={f}>
-                {FORMATS[f].label}
-              </option>
-            ))}
-          </select>
-          <button onClick={() => rt.togglePlay()}>{s.playing ? "pausa" : "play"}</button>
-          <button onClick={() => exportPng(rt)}>png</button>
-          {env?.exports?.svg && <button onClick={() => exportSvg(rt)}>svg</button>}
-          <button onClick={() => exportMp4Download(rt)} disabled={!!s.exporting}>
-            mp4
+          <button className="dialkit-button dialkit-toolbar-primary" onClick={() => void exportMp4Download(rt)} disabled={!!s.exporting}>
+            MP4
           </button>
         </div>
       </header>
@@ -111,34 +114,48 @@ export function App({ rt }: { rt: Runtime }) {
           {env && <Panel key={env.id} rt={rt} env={env} />}
           <DialRoot mode="inline" theme="dark" productionEnabled />
         </div>
-        <section className="block">
-          <h2>presets</h2>
-          <ol className="presets">
-            {env?.presets.map((p, i) => (
-              <li key={p.name}>
-                <button onClick={() => applyPreset(rt, i)}>
-                  <span className="n">{i + 1}</span> {p.name}
-                </button>
-              </li>
-            ))}
-          </ol>
-          <div className="row">
-            <button onClick={() => savePresetFile(rt)}>guardar json</button>
-            <label className="button">
-              cargar json
-              <input type="file" accept="application/json,.json" onChange={(e) => loadPresetFile(rt, e.target.files?.[0])} hidden />
-            </label>
+
+        <div className="dialkit-panel card" data-mode="inline">
+          <div className="dialkit-panel-inner">
+            <Folder title="Salida" defaultOpen isRoot inline>
+              <SelectControl
+                label="Formato"
+                value={s.fmt}
+                options={FORMAT_IDS.map((f) => ({ value: f, label: FORMATS[f].label }))}
+                onChange={(v) => rt.setFormat(v as FormatId)}
+              />
+              <SelectControl
+                label="Par"
+                value={String(s.pair)}
+                options={PAIRS.map((p, i) => ({ value: String(i), label: p.name }))}
+                onChange={(v) => rt.setPair(Number(v))}
+              />
+              <Toggle label="Invertir" checked={s.invert} onChange={() => rt.toggleInvert()} />
+              <Toggle label="Reproducir" checked={s.playing} onChange={(v) => rt.setPlaying(v)} />
+              <TextControl
+                label="Semilla"
+                value={seedText}
+                onChange={(v) => {
+                  setSeedText(v);
+                  if (/^\d+$/.test(v)) rt.setSeed(Number(v));
+                }}
+              />
+              <ButtonGroup buttons={exportButtons} />
+              <Folder title="Presets" defaultOpen>
+                {env && env.presets.length > 0 && (
+                  <ButtonGroup buttons={env.presets.map((p, i) => ({ label: `${i + 1} · ${p.name}`, onClick: () => applyPreset(rt, i) }))} />
+                )}
+                <ButtonGroup
+                  buttons={[
+                    { label: "Guardar JSON", onClick: () => savePresetFile(rt) },
+                    { label: "Cargar JSON", onClick: () => file.current?.click() },
+                  ]}
+                />
+              </Folder>
+            </Folder>
+            <input ref={file} type="file" accept="application/json,.json" hidden onChange={(e) => loadPresetFile(rt, e.target.files?.[0])} />
           </div>
-          <div className="row">
-            <span>semilla</span>
-            <input
-              className="seed"
-              type="number"
-              value={s.seed}
-              onChange={(e) => Number.isFinite(+e.target.value) && rt.setSeed(+e.target.value)}
-            />
-          </div>
-        </section>
+        </div>
       </aside>
 
       <footer className="status">
@@ -150,7 +167,7 @@ export function App({ rt }: { rt: Runtime }) {
           </span>
         ) : (
           <>
-            <span>
+            <span className="strong">
               {s.envNum} {s.envTitle}
             </span>
             {s.source && <span>fuente: {s.source}</span>}

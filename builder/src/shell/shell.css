@@ -1,4 +1,5 @@
-/* Shell del builder: herramienta, no dashboard. Bordes de 1 px, sin radios, sin sombras, minúscula. */
+/* Shell con el lenguaje de DialKit: usa sus tokens (--dial-*) y sus clases.
+   El canvas (la pieza) sigue en Archivo Narrow y 2 colores; la UI es la de DialKit. */
 @font-face {
   font-family: "Archivo Narrow";
   font-weight: 400;
@@ -15,14 +16,6 @@
   src: url("/fonts/ArchivoNarrow-Bold.ttf") format("truetype");
 }
 
-:root {
-  --bg: #0c0c0c;
-  --fg: #ffffff;
-  --line: 1px solid #ffffff;
-  --pad: 8px;
-  --side: 300px;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -32,108 +25,92 @@ body,
 #root {
   margin: 0;
   height: 100%;
-  background: var(--bg);
-  color: var(--fg);
-  font: 400 14px/1.25 "Archivo Narrow", sans-serif;
-  font-variant-numeric: tabular-nums;
-}
-
-button,
-select,
-input,
-.button {
-  font: inherit;
-  color: var(--fg);
-  background: var(--bg);
-  border: var(--line);
-  border-radius: 0;
-  padding: 3px 8px;
-  cursor: pointer;
-  text-transform: lowercase;
-}
-button:disabled {
-  cursor: default;
-  opacity: 1;
-  color: #ffffff;
-  text-decoration: line-through;
-  border-color: transparent;
-}
-button.on {
-  background: var(--fg);
-  color: var(--bg);
-}
-button:focus-visible,
-select:focus-visible,
-input:focus-visible {
-  outline: 1px solid var(--fg);
-  outline-offset: 2px;
+  background: #141414;
 }
 
 .shell {
+  --side: 320px;
+  --gap: 12px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--side);
   grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--gap);
   height: 100%;
+  padding: var(--gap);
+  color: var(--dial-text-primary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 
+/* barra: misma tarjeta que el panel de DialKit */
 .bar {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
-  gap: var(--pad);
-  border-bottom: var(--line);
-  padding: var(--pad);
+  gap: 10px;
   min-width: 0;
+  padding: 6px 8px 6px 14px;
+  background: var(--dial-glass-bg);
+  border: 1px solid var(--dial-border);
+  border-radius: 14px;
 }
 .brand {
-  font-weight: 700;
-  padding-right: var(--pad);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dial-text-root);
+  padding-right: 4px;
 }
 .switcher {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
   flex: 1;
   min-width: 0;
-  scrollbar-width: thin;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
-.switcher button {
+.switcher::-webkit-scrollbar {
+  display: none;
+}
+.switcher .dialkit-segmented-button {
   white-space: nowrap;
-  border-color: transparent;
-  padding: 3px 6px;
+  border-radius: 6px;
 }
-.switcher button.on {
-  border-color: var(--fg);
+.switcher .dialkit-segmented-button[data-active="true"] {
+  background: var(--dial-surface-active);
 }
-.n {
-  font-weight: 500;
+.switcher .dialkit-segmented-button:not(:disabled):hover {
+  background: var(--dial-surface-hover);
+  color: var(--dial-text-primary);
+}
+.switcher .dialkit-segmented-button:disabled {
+  color: var(--dial-text-tertiary);
+  cursor: default;
+}
+.switcher .n {
+  color: var(--dial-text-tertiary);
+  margin-right: 2px;
+}
+.switcher [data-active="true"] .n {
+  color: var(--dial-text-secondary);
 }
 .tools {
   display: flex;
-  gap: 4px;
-  align-items: center;
-  border-left: var(--line);
-  padding-left: var(--pad);
-}
-.pair {
-  display: flex;
-  align-items: center;
   gap: 6px;
 }
-.chip {
-  display: inline-block;
-  border: 1px solid;
-  padding: 0 4px;
-  font-weight: 700;
+.tools .dialkit-button {
+  flex: 0 0 auto;
+  padding: 7px 14px;
 }
 
 .stage {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
   min-height: 0;
   overflow: hidden;
+  background: var(--dial-glass-bg);
+  border: 1px solid var(--dial-border);
+  border-radius: 14px;
+  padding: 20px;
 }
 .stage canvas {
   display: block;
@@ -141,74 +118,54 @@ input:focus-visible {
   max-height: 100%;
   width: auto;
   height: auto;
-  border: var(--line);
 }
 
 .side {
   grid-row: 2;
   grid-column: 2;
-  border-left: var(--line);
   display: flex;
   flex-direction: column;
+  gap: var(--gap);
   min-height: 0;
   overflow-y: auto;
+  scrollbar-width: none;
 }
-.dials {
-  flex: 1 0 auto;
-  min-height: 240px;
+.side::-webkit-scrollbar {
+  display: none;
 }
-.block {
-  border-top: var(--line);
-  padding: var(--pad);
-  display: grid;
-  gap: var(--pad);
+.card .dialkit-panel-inner {
+  backdrop-filter: none;
 }
-.block h2 {
-  font-size: inherit;
-  font-weight: 700;
-  margin: 0;
-}
-.presets {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 2px;
-}
-.presets button {
-  width: 100%;
-  text-align: left;
-  border-color: transparent;
-}
-.presets button:hover {
-  border-color: var(--fg);
-}
-.row {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-.seed {
-  width: 7em;
+.card .dialkit-button-group + .dialkit-button-group {
+  margin-top: var(--dial-row-gap);
 }
 
 .status {
   grid-column: 1 / -1;
-  border-top: var(--line);
-  padding: 6px var(--pad);
   display: flex;
   gap: 16px;
+  padding: 0 4px;
   white-space: nowrap;
   overflow: hidden;
+  color: var(--dial-text-label);
+  font-size: 12px;
+}
+.status .strong {
+  color: var(--dial-text-primary);
+  font-weight: 500;
 }
 .status .keys {
   margin-left: auto;
+  color: var(--dial-text-tertiary);
 }
 .err {
-  text-decoration: underline;
+  color: #ef7777;
 }
 
 /* render headless: solo el canvas, sin escalar */
+.shell.render {
+  padding: 0;
+}
 .shell.render .bar,
 .shell.render .side,
 .shell.render .status {
@@ -224,8 +181,6 @@ input:focus-visible {
   .side {
     grid-row: 3;
     grid-column: 1;
-    border-left: 0;
-    border-top: var(--line);
   }
   .stage {
     height: 70vh;
@@ -233,9 +188,6 @@ input:focus-visible {
   .status {
     flex-wrap: wrap;
     white-space: normal;
-  }
-  .tools {
-    border-left: 0;
   }
   .bar {
     flex-wrap: wrap;
