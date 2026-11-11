@@ -68,3 +68,8 @@
 - El sonido no se escuchó (headless): se probó que los eventos salen con los tiempos correctos, no el timbre. MIDI sin probar (no hay dispositivos acá).
 - `postMessage` al Motion Instrument publicado en themotionsocial.club: sin probar (dominio bloqueado desde el contenedor); el listener lo acepta.
 - Los entornos de la fase 3 se construyeron sin frenar en sus paradas 1 y 2 propias (Esteban pidió seguir); todas las decisiones están al final de cada `PLAN.md`.
+
+## 11/11/2026 — Claude Code (publicación + DialKit sin modificaciones)
+- **19:10** Publicado: PR estebangonzalezuy/sketches#5 mergeado a main; el preview de Vercel del commit había terminado bien. La URL pública es estebangonzalez.co/sketches/builder (rewrite de portfolio: /sketches/:path+ → sketches-rose.vercel.app). Desde este contenedor no se puede abrir ninguno de los dos dominios, así que no se vio en vivo.
+- **00:23** Pedido de Esteban: "la UI a un DialKit original sin modificaciones". Se sacaron la barra, el segmentado y la tarjeta que imitaban DialKit con sus clases, y todo el CSS que tocaba esas clases. Los controles del builder (entorno, formato, par, invertir, reproducir, semilla, export, presets, JSON) ahora son un panel DialKit más, declarado con su config (`src/shell/BuilderPanel.tsx`); `DialRoot` inline sin estilos encima.
+- Bug encontrado por el test de atajos (falla intermitente): al volver a un entorno, DialKit restaura los valores viejos del panel por su id y el panel y el runtime se peleaban (Maximum update depth). Arreglo: valor acordado (`synced`) + espera explícita a que se refleje el setValues propio. Test de atajos 3/3 y suite completa en verde; se sumó un test del select "Entorno".
