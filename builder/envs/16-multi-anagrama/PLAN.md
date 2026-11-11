@@ -37,3 +37,12 @@ Antes de cualquier cambio que toque este entorno o el core, verificá que siga v
 
 ## Si un bug sobrevive dos arreglos (paso 6)
 Parar. Anotar en `PROCESS.md` qué se intentó, por qué falló el enfoque y proponer rehacer la parte (no un tercer parche).
+
+---
+
+## Decisiones de Claude Code (fase 3) — 11/11/2026
+- Elección B confirmada: una asignación húngara por transición (motor de Anagrama) y la identidad se propaga componiendo σ_k; el SVG arma **una polilínea por letra física** a lo largo de toda la cadena.
+- La cadena vuelve de la última palabra a la primera. Si un par no es anagrama: se avisa en el canvas («X» → «Y» no es anagrama: corte sin animar), esa transición es un corte y la polilínea se interrumpe ahí.
+- Sin `stagger` (el SPEC no lo trae); easing in-out cúbico fijo.
+- `loop`: seamless en `palabra`; `cut` en las vistas con trazas (el tejido se limpia al reiniciar).
+- Presets con palabras reales; se descartaron "DERILA" y "SORA" por no ser palabras (no inventar).

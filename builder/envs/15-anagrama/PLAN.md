@@ -37,3 +37,13 @@ Antes de cualquier cambio que toque este entorno o el core, verificá que siga v
 
 ## Si un bug sobrevive dos arreglos (paso 6)
 Parar. Anotar en `PROCESS.md` qué se intentó, por qué falló el enfoque y proponer rehacer la parte (no un tercer parche).
+
+---
+
+## Decisiones de Claude Code (fase 3) — 11/11/2026
+- Motor compartido en `src/envs/_anagrama/engine.ts` (húngaro O(n³) propio, layout, arcos, cubic-bezier); Multi-anagrama lo importa, no hay copia.
+- **Asignación:** costo = distancia² entre centros; letras distintas tienen costo 1e12 (nunca se emparejan). Mayúsculas/minúsculas y tildes cuentan como letras distintas (Ó ≠ O): se avisa en el canvas.
+- **Arcos (elección B):** control = punto medio − normal·(curva·d/2). Hacia la derecha pasa por arriba, hacia la izquierda por abajo: dos letras que viajan en sentidos opuestos nunca comparten lado. La vuelta usa el mismo par al revés, así que pasa por el otro lado (ida y vuelta dibujan un óvalo).
+- **Easing:** el control de DialKit devuelve un TransitionConfig; se lee su `ease` [x1,y1,x2,y2] y se evalúa con un cubic-bezier propio (bisección), determinista. El `duration` del control no se usa: el tiempo lo da `movimiento.duración`.
+- Los arcos salen del centro óptico de cada letra (media altura de mayúscula), no de la línea base.
+- Probado: loop exacto (0,00 %), determinismo, 2 colores, SVG (trayectorias + palabra), MP4 (dos caminos).

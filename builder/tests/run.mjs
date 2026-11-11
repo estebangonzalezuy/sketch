@@ -79,7 +79,9 @@ try {
         await page.evaluate(([pair, invert]) => window.__builder.loadPreset({ pair, invert }), [p, inv]);
         const [bg, fg] = inv ? [PAIRS[p][1], PAIRS[p][0]] : PAIRS[p];
         const r = offLine(await pixels(page, 45), bg, fg);
-        ok(`${env} píxeles par ${p}${inv ? " inv" : ""}`, r.worst <= 3, `${r.colors} colores, desvío máx ${r.worst.toFixed(1)}`);
+        // tolerancia 4 (≈2 niveles por canal): donde se superponen bordes antialiasados, Skia redondea
+        // 1–2 niveles más allá del fg (p. ej. #0A0A0A sobre #0C0C0C). No es un tercer color.
+        ok(`${env} píxeles par ${p}${inv ? " inv" : ""}`, r.worst <= 4, `${r.colors} colores, desvío máx ${r.worst.toFixed(1)}`);
       }
     }
     await page.evaluate(() => window.__builder.loadPreset({ pair: 0, invert: false }));
@@ -109,6 +111,13 @@ try {
       const fT = await pixels(page, Math.round(T * 30));
       const d = diffFrac(f0, fT);
       ok(`${env} loop cierra (frame 0 ≈ frame T)`, d < 0.02, `${(d * 100).toFixed(2)} % de píxeles distintos`);
+    }
+
+    // SVG (si el entorno lo exporta): bien formado, solo los 2 colores del par
+    const svg = await page.evaluate(() => window.__builder.svg());
+    if (svg !== null) {
+      const cols = [...new Set((svg.match(/#[0-9a-f]{6}/gi) ?? []).map((c) => c.toUpperCase()))];
+      ok(`${env} svg`, svg.startsWith("<svg") && svg.trim().endsWith("</svg>") && cols.length <= 2, `${(svg.length / 1024).toFixed(1)} kB, colores ${cols.join(" ")}`);
     }
 
     // 6 ─ MP4 camino 1

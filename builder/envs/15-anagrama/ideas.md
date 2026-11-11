@@ -6,7 +6,7 @@ Paso 4 de Szymon. Todo lo que aparezca fuera de alcance va acá, no al código. 
 
 | Idea | Nota | Tamaño | Estado |
 |---|---|---|---|
-| Versión 1 del entorno | Dos palabras anagramas (AMOR/ROMA): las letras viajan por trayectorias óptimas (asignación húngara) sin chocar. | S | después |
+| Versión 1 del entorno | Dos palabras anagramas (AMOR/ROMA): las letras viajan por trayectorias óptimas (asignación húngara) sin chocar. | S | hecha (11/11) |
 | Mostrar el costo total |  | S | después |
 | Kerning real de Archivo Narrow con opentype.js |  | S | después |
-| Presets curados (3 a 6) | Cada preset es un loop mostrable para IG/X | S | después |
+| Presets curados (3 a 6) | 5 en `src/envs/anagrama/presets.ts` | S | hecha |
