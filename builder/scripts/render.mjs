@@ -28,6 +28,16 @@ try {
   if (a.inv) q.inv = a.inv;
   const { page } = await openBuilder(browser, server.url, q);
   if (preset) await page.evaluate((p) => window.__builder.loadPreset(p), { ...preset, fmt });
+  if (a.still !== undefined) {
+    // --still N: PNG del frame N (por defecto, 2/3 de la duración)
+    const n = a.still === "1" && !process.argv.includes("1") ? null : Number(a.still);
+    const dur = await page.evaluate(() => window.__builder.duration());
+    const frame = n ?? Math.round(dur * 30 * 0.66);
+    const url = await page.evaluate((i) => window.__builder.frame(i), frame);
+    const png = out.replace(/\.mp4$/, ".png");
+    (await import("node:fs")).writeFileSync(png, Buffer.from(url.split(",")[1], "base64"));
+    console.log(`${png} · frame ${frame}`);
+  } else {
   const seconds = Number(a.seconds ?? (await page.evaluate(() => window.__builder.duration())));
   const total = Math.round(seconds * 30);
 
@@ -55,6 +65,7 @@ try {
   ff.stdin.end();
   await done;
   console.log(`\n${out} · ${total} frames · ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+  }
 } finally {
   await browser.close();
   await server.close();

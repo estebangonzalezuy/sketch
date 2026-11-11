@@ -6,9 +6,10 @@ Paso 4 de Szymon. Todo lo que aparezca fuera de alcance va acá, no al código. 
 
 | Idea | Nota | Tamaño | Estado |
 |---|---|---|---|
-| Versión 1 del entorno | Mapa logístico: barrés r y aparece el diagrama de bifurcación; un punto salta entre ramas. | S | después |
+| Versión 1 del entorno | Mapa logístico: barrés r y aparece el diagrama de bifurcación; un punto salta entre ramas. | S | hecha (11/11) |
 | Cobweb plot lateral |  | S | después |
 | Sonificación: el período como ritmo |  | S | después |
 | Otros mapas (seno, tienda) |  | S | después |
 | Zoom infinito a la autosimilitud |  | M | después |
-| Presets curados (3 a 6) | Cada preset es un loop mostrable para IG/X | S | después |
+| Presets curados (3 a 6) | 5 en `src/envs/bifurcacion/presets.ts` | S | hecha |
+| SVG de ejes + punto | El árbol es raster (dither): `exports.svg` omitido en v1 | S | después |

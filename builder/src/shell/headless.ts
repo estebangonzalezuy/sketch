@@ -52,6 +52,7 @@ function api(rt: Runtime) {
     preset: () => rt.preset(),
     state: () => rt.state,
     duration: () => rt.timeline.duration,
+    timeline: () => rt.timeline,
     codec: () => pickCodec(rt.out.width, rt.out.height),
     /** camino 1 (WebCodecs) desde la consola o un test: devuelve el MP4 en base64 */
     async exportMp4(seconds?: number): Promise<string> {

@@ -17,7 +17,7 @@ export const ENVS: EnvEntry[] = [
   { num: "03", id: "orbita-saturada", title: "órbita saturada" },
   { num: "04", id: "huella-de-voz", title: "huella de voz" },
   { num: "05", id: "superilla", title: "superilla" },
-  { num: "06", id: "bifurcacion", title: "bifurcación" },
+  { num: "06", id: "bifurcacion", title: "bifurcación", load: () => import("./bifurcacion") },
   { num: "07", id: "atractor", title: "atractor", load: () => import("./atractor") },
   { num: "08", id: "polirritmo", title: "polirritmo" },
   { num: "09", id: "gramatica-de-plantas", title: "gramática de plantas" },

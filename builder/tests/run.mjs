@@ -17,7 +17,8 @@ const PAIRS = [
   ["#3C240C", "#CC84FC"],
   ["#0C540C", "#F06CCC"],
 ];
-const ENVS = ["atractor", "feedback"];
+// entornos implementados = los que tienen load() en el registro
+const ENVS = [...readFileSync(resolve(ROOT, "src/envs/index.ts"), "utf8").matchAll(/id: "([^"]+)"[^\n]*load: \(\) => import/g)].map((m) => m[1]).filter((e) => !process.env.ONLY || process.env.ONLY.split(",").includes(e));
 let fails = 0;
 const ok = (name, cond, info = "") => {
   console.log(`${cond ? "ok  " : "FALLA"} ${name}${info ? ` · ${info}` : ""}`);
@@ -102,12 +103,12 @@ try {
     ok(`${env} preset ida y vuelta`, diffFrac(a, c) === 0 && JSON.stringify(saved) === JSON.stringify(await page.evaluate(() => window.__builder.preset())), `cambio intermedio ${(diffFrac(a, changed) * 100).toFixed(1)} %`);
 
     // 5 ─ loop del atractor
-    if (env === "atractor") {
+    if ((await page.evaluate(() => window.__builder.timeline().loop)) === "seamless") {
       const T = await page.evaluate(() => window.__builder.duration());
       const f0 = await pixels(page, 0);
       const fT = await pixels(page, Math.round(T * 30));
       const d = diffFrac(f0, fT);
-      ok("atractor loop cierra (frame 0 ≈ frame T)", d < 0.02, `${(d * 100).toFixed(2)} % de píxeles distintos`);
+      ok(`${env} loop cierra (frame 0 ≈ frame T)`, d < 0.02, `${(d * 100).toFixed(2)} % de píxeles distintos`);
     }
 
     // 6 ─ MP4 camino 1

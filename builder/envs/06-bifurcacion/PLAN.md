@@ -37,3 +37,12 @@ Antes de cualquier cambio que toque este entorno o el core, verificá que siga v
 
 ## Si un bug sobrevive dos arreglos (paso 6)
 Parar. Anotar en `PROCESS.md` qué se intentó, por qué falló el enfoque y proponer rehacer la parte (no un tercer parche).
+
+---
+
+## Decisiones de Claude Code (fase 3) — 11/11/2026
+- Elección B confirmada. El árbol se calcula **una vez por params** (4 valores de r por columna, histograma, p99 global, Bayer 4×4) y cada frame revela columnas hasta el r de ese t: las ya dibujadas no cambian por construcción.
+- **Período medido:** busca el menor p ≤ 64 con |xₙ − xₙ₊ₚ| < 1e-5 en las últimas 128 iteraciones; si no hay, el exponente de Lyapunov decide "caos" (λ > 0) o "período —".
+- Barrido lineal en `barrido.segundos` + 1,5 s con el árbol completo; `loop: "cut"`.
+- **SVG omitido** (el árbol es raster); queda en `ideas.md`.
+- Probado: determinismo, 2 colores en los 4 pares, preset ida y vuelta, MP4 (los dos caminos).
