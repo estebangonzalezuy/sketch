@@ -1,3 +1,20 @@
+# builder
+
+App de navegador con tools generativas como entornos. Se sirve en `/sketches/builder`.
+
+```bash
+npm install
+npm run dev          # http://localhost:5190/?env=atractor
+npm test             # paleta, determinismo, presets, loop, MP4 (WebCodecs) y atajos, en Chrome headless
+npm run render -- --env feedback --seconds 10 --out out/feedback.mp4   # camino 2: headless + ffmpeg
+```
+
+Fuera de la Mac, `CHROME_PATH` apunta al Chrome que usa el render; en la Mac usa el Chrome instalado. `ffmpeg` tiene que estar en el PATH.
+
+Estado (fase 2): core + Atractor (07) y Feedback (13). El resto aparece tachado en el switcher. Bitácora en `PROCESS.md`.
+
+---
+
 # builder — paquete para Claude Code
 
 *Armado por Taller para Esteban González el 11/11/2026 (hora de Madrid). Nada publicado. Actualizado el mismo día: se sacó Edad de la Ciudad, se sumó el prompt de introducción y, más tarde, un `CLAUDE-PROMPT.md` por entorno para pegar cuando se construya esa tool.*

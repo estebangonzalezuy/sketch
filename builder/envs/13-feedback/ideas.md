@@ -6,8 +6,8 @@ Paso 4 de Szymon. Todo lo que aparezca fuera de alcance va acá, no al código. 
 
 | Idea | Nota | Tamaño | Estado |
 |---|---|---|---|
-| Versión 1 del entorno | Video feedback recursivo (cámara frente a su pantalla) simulado, con zoom, rotación y umbral 1-bit en cada iteración. | S | después |
+| Versión 1 del entorno | Video feedback recursivo (cámara frente a su pantalla) simulado, con zoom, rotación y umbral 1-bit en cada iteración. | S | hecha (11/11, testigo de la fase 2) |
 | Semilla desde webcam |  | S | después |
 | Ruido de 'CRT' (desplazamiento horizontal) |  | S | después |
 | Dos transformaciones alternadas (IFS) |  | M | después |
-| Presets curados (3 a 6) | Cada preset es un loop mostrable para IG/X | S | después |
+| Presets curados (3 a 6) | 5 en `src/envs/feedback/presets.ts` (teclas 1–5) | S | hecha |

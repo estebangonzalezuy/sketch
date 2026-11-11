@@ -37,3 +37,13 @@ Antes de cualquier cambio que toque este entorno o el core, verificá que siga v
 
 ## Si un bug sobrevive dos arreglos (paso 6)
 Parar. Anotar en `PROCESS.md` qué se intentó, por qué falló el enfoque y proponer rehacer la parte (no un tercer parche).
+
+---
+
+## Decisiones de Claude Code al construirlo (fase 2, testigo) — 11/11/2026
+
+Construido como testigo sin pasar por sus paradas propias (fase 2 del maestro). Elección B confirmada (ping-pong WebGL2).
+- **`invertir`:** invierte el cuadro transformado en cada iteración (antes de sumar la semilla); afuera del cuadro cuenta como fondo. Con `cada = 1` cada generación queda con polaridad alternada y la imagen es estable (marcos anidados); con `cada > 1` estroboscopea a propósito. Es el comportamiento de un feedback real.
+- **Resolución:** el estado vive a 1/1, 1/2 o 1/4 y se muestra con `texelFetch` (nearest) al tamaño del canvas; la transform muestrea con LINEAR y el umbral re-binariza.
+- **Texto:** el pie con zoom/rotación/umbral va en la capa 2D del builder con una caja `bg` detrás (sigue siendo el par).
+- Medido: ≈42 ms/frame con PNG en el contenedor (sin GPU); preview ≈20–24 fps acá.
