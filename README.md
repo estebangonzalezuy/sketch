@@ -31,6 +31,18 @@ npm test           # Vitest data checks
 npm run lint
 ```
 
+## Styleframe tools
+
+Three short typographic sketches live at `/tools` (same `npm run dev`). They share a timeline, easing curves, palette and frame-by-frame export in `src/styleframe/`. What’s done, what’s rough, and a prompt for finishing them are in `src/styleframe/HANDOFF.md`.
+
+```bash
+npm run dev
+# http://localhost:5173/tools
+# http://localhost:5173/tools/glyph-construct
+# http://localhost:5173/tools/font-roulette
+# http://localhost:5173/tools/bitmap-reveal
+```
+
 ## Updating the data
 
 1. Replace `data/studios.csv`. Keep the columns `name,city,country,website,specialties,source`.
