@@ -1,0 +1,22 @@
+@font-face { font-family: "Archivo Narrow"; src: url("/fonts/ArchivoNarrow-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Archivo Narrow"; src: url("/fonts/ArchivoNarrow-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Archivo Narrow"; src: url("/fonts/ArchivoNarrow-Bold.ttf"); font-weight: 700; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #0C0C0C; color: #FFFFFF; font-family: "Archivo Narrow", sans-serif; font-size: 14px; }
+body { display: grid; grid-template-columns: 290px 1fr; }
+#ui { overflow-y: auto; padding: 14px 16px 40px; border-right: 1px solid #FFFFFF; }
+#ui h1 { font-size: 22px; font-weight: 700; margin: 0 0 2px; }
+#ui .sub { margin: 0 0 14px; opacity: .7; }
+#ui section { border-top: 1px solid #FFFFFF; padding: 10px 0 8px; }
+#ui section > p { margin: 0 0 6px; font-weight: 700; }
+#ui label { display: grid; grid-template-columns: 1fr 120px 42px; gap: 6px; align-items: center; margin: 4px 0; }
+#ui label.sel { grid-template-columns: 1fr 162px; }
+#ui input[type=range] { width: 100%; accent-color: #FFFFFF; }
+#ui select, #ui button { font: inherit; background: #0C0C0C; color: #FFFFFF; border: 1px solid #FFFFFF; padding: 3px 6px; border-radius: 0; }
+#ui button { cursor: pointer; margin: 2px 2px 2px 0; }
+#ui button:hover { background: #FFFFFF; color: #0C0C0C; }
+#ui .val { text-align: right; font-variant-numeric: tabular-nums; }
+#ui .note { opacity: .7; line-height: 1.35; margin: 6px 0; }
+#ui kbd { border: 1px solid #FFFFFF; padding: 0 3px; font-family: inherit; }
+#stagewrap { display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 16px; }
+#stage { max-width: 100%; max-height: calc(100vh - 32px); image-rendering: auto; }

@@ -1,0 +1,30 @@
+{
+  "name": "builder",
+  "private": true,
+  "type": "module",
+  "description": "Builder de Esteban González: tools generativas como entornos (React + Vite + TS + DialKit). Versiones verificadas en npm el 11/11/2026.",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "node tests/run.mjs && node tests/keys.mjs && node tests/polirritmo.mjs",
+    "render": "node scripts/render.mjs",
+    "sheet": "node scripts/sheet.mjs",
+    "reel": "node scripts/reel.mjs"
+  },
+  "dependencies": {
+    "dialkit": "^2.2.0",
+    "motion": "^14.12.0",
+    "mp4-muxer": "^5.2.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "playwright-core": "^1.65.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  }
+}

@@ -1,0 +1,20 @@
+{
+ "_nota": "Muchos agentes y rastro largo: tubos gruesos, se ve la trama. No ajustado mirando la red real.",
+ "agents": 500000,
+ "sensorAngle": 22.5,
+ "turnAngle": 45,
+ "sensorDist": 9,
+ "stepSize": 1,
+ "deposit": 4,
+ "decay": 0.06,
+ "diffuse": 1,
+ "food": 15,
+ "foodRadius": 3,
+ "spawn": "estaciones",
+ "spawnRadius": 5,
+ "stepsPerFrame": 3,
+ "expo": 25,
+ "gamma": 1,
+ "cell": 2,
+ "respawn": 0.001
+}

@@ -1,0 +1,29 @@
+{
+  "tEnd": 600,
+  "cutoff": 0.04,
+  "penWidth": 1.2,
+  "drawSeconds": 10,
+  "holdSeconds": 2,
+  "timeMode": "fisico",
+  "palette": 1,
+  "invert": true,
+  "caption": true,
+  "margin": 0.08,
+  "name": "3:4 lento",
+  "pendulums": [
+    {
+      "axis": "x",
+      "freq": 3,
+      "phase": 0.6,
+      "amp": 1,
+      "damp": 0.0018
+    },
+    {
+      "axis": "y",
+      "freq": 4.003,
+      "phase": 0,
+      "amp": 1,
+      "damp": 0.0018
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+# Corpus semilla para Markov de Notas
+# Mensajes escritos por Esteban González a Taller el 11/11/2026, copiados textual (con sus typos).
+# Es poco texto: pegá más (captions de IG, notas, posts) en el textarea del entorno.
+
+como podemos taggear referencias
+
+pero me refiero a una libreria general con tags, ej un figma con tags o lo que pueda ser gratis
+
+me encantan herramientas de mind maps, figjam es gratis? podria servir
+
+como seria el ejemplo de obsidian
+
+Me gustan 4, 6, 8, 9 y 10 pero 10 en geneeal, que se puedan ajustar esas cosas
+Que no se animen como lista, que tengan modo footage y canvas donde no se ve el footage pero si los tags por arriba
+
+Si, hagamos una prueba
+
+esto en realidad quiero que sea un prompt para armar en claude code, asi que dame un prompt realmente extenso para hacerlo bien
+
+dame captura de todas
+
+Bien, tendría que ver todas las ideas porque si no, no tiene sentido. De estas que me mostraste me gusta la de Fisarum me gusta y me gustaría que la actualices. Viendo, por ejemplo, en Google Maps podés ver todas las líneas de metro, de Barcelona. Y aplicarlo como a líneas de metro de distintos países y aplicarlo igual que las tools que estábamos manejando antes donde podemos tener una versión, mapa y una versión, eh, o sea una versión como, como si fuera una foto satelital de la ciudad y una versión canvas al lado. Pero me gusta para solo con esa idea. Después. Me gusta la edad de la ciudad, esa visualización no me, hagamosla más minimalista, pero se puede desarrollar. El armonógrafo me gusta, armémoslo. Y del resto no prefiero ninguna, pero mostrame las que me faltan ver.
+
+este tipo de proyectos busco cuando pienso en algo 'live' o en crear desde lo que ya hay / me gustaria armar visuales de footage como eso, con tracking, tipo tags o pueden ser simbolos u otros elementos / armate 3 ideas a grandes rasgos asi las vemos
+
+1 y 2 me gustan, podes armar un boceto rapido para explicar la idea?
+
+me gusta, el 2do es una copia exacta de la referencia que pasé, así que descartémoslo / dame 10 ideas que podrian salir del 1ro, como para crear visuales en toda
+
+me gusta, armate bocetos con mixkit de cada idea

@@ -1,0 +1,11 @@
+import { chromium } from "playwright-core";
+const b = await chromium.launch({ headless: true, executablePath: "/usr/bin/google-chrome", args: ["--no-sandbox"] });
+const p = await b.newPage({ viewport: { width: 1440, height: 1000 } });
+p.on("pageerror", e => console.log("[pageerror]", e.message));
+p.on("console", m => console.log("[console]", m.text()));
+await p.goto("http://127.0.0.1:5191/", { waitUntil: "networkidle" });
+await p.waitForTimeout(Number(process.argv[3] || 6000));
+const wc = await p.evaluate(async () => { try { return (await VideoEncoder.isConfigSupported({ codec: "avc1.640028", width: 1080, height: 1350, bitrate: 1e7, framerate: 30 })).supported; } catch (e) { return String(e); } });
+console.log("webcodecs avc:", wc);
+await p.screenshot({ path: process.argv[2] || "out/ui.png" });
+await b.close();

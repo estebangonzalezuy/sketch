@@ -1,0 +1,32 @@
+[
+ {
+  "id": "barcelona",
+  "label": "Barcelona",
+  "stations": 159
+ },
+ {
+  "id": "madrid",
+  "label": "Madrid",
+  "stations": 243
+ },
+ {
+  "id": "tokyo",
+  "label": "Tokio",
+  "stations": 217
+ },
+ {
+  "id": "london",
+  "label": "Londres",
+  "stations": 271
+ },
+ {
+  "id": "cdmx",
+  "label": "Ciudad de México",
+  "stations": 181
+ },
+ {
+  "id": "buenosaires",
+  "label": "Buenos Aires",
+  "stations": 87
+ }
+]

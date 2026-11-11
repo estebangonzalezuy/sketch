@@ -66,6 +66,14 @@ const SKETCHES: Sketch[] = [
     build: 'vite',
     dir: 'anticipator',
   },
+  {
+    slug: 'builder',
+    name: 'Builder',
+    what: 'Tools generativas como entornos intercambiables, con diales de DialKit, 2 colores y export MP4/PNG. En construcción: Atractor y Feedback.',
+    stack: 'Vite · React · TypeScript · DialKit',
+    build: 'vite',
+    dir: 'builder',
+  },
 ];
 
 const run = (cmd: string, cwd: string) => execSync(cmd, { cwd, stdio: 'inherit' });

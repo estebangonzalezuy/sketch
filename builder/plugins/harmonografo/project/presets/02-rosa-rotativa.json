@@ -1,0 +1,36 @@
+{
+  "tEnd": 600,
+  "cutoff": 0.04,
+  "penWidth": 1.2,
+  "drawSeconds": 10,
+  "holdSeconds": 2,
+  "timeMode": "fisico",
+  "palette": 1,
+  "invert": false,
+  "caption": true,
+  "margin": 0.08,
+  "name": "rosa rotativa",
+  "pendulums": [
+    {
+      "axis": "x",
+      "freq": 3.001,
+      "phase": 0,
+      "amp": 0.8,
+      "damp": 0.003
+    },
+    {
+      "axis": "y",
+      "freq": 2,
+      "phase": 0.5,
+      "amp": 0.8,
+      "damp": 0.0035
+    },
+    {
+      "axis": "rot",
+      "freq": 2.997,
+      "phase": 1.2,
+      "amp": 0.55,
+      "damp": 0.0025
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+Footage (Mixkit License — free for personal and commercial use)
+All plates: 1080×1350, 4:5, 30 fps.
+
+1, 3, 6, 10 — calle de París
+   Mixkit #4348 — “A calm street in Paris”
+   https://mixkit.co/free-stock-video/a-calm-street-in-paris-4348/
+   1080p: https://assets.mixkit.co/videos/4348/4348-1080.mp4
+   Crop 4:5 from x=1016 of 1920×1080, start at 5.0s of the source.
+   Used in: 01 inventario, 03 tiempo, 06 medidas, 10 live.
+
+2 — palomas en un parque
+   Mixkit #26333 — “Pigeons eating in a city park”
+   https://mixkit.co/free-stock-video/pigeons-eating-in-a-city-park-26333/
+   720p: https://assets.mixkit.co/videos/26333/26333-720.mp4
+   Crop 4:5, upscaled to 1080×1350.
+   Used in: 02 precios.
+
+4, 8 — cruce en Nueva York
+   Mixkit #4000 — “Busy street in the city”
+   https://mixkit.co/free-stock-video/busy-street-in-the-city-4000/
+   1080p: https://assets.mixkit.co/videos/4000/4000-1080.mp4
+   Crop 4:5, 7.5s plate.
+   Used in: 04 trayectorias, 08 contador.
+
+5 — plaza con arcadas (estilo europeo; no es Barcelona)
+   Mixkit #4373 — “Public plaza surrounded by European-style buildings”
+   https://mixkit.co/free-stock-video/public-plaza-surrounded-by-european-style-buildings-4373/
+   720p: https://assets.mixkit.co/videos/4373/4373-720.mp4
+   Crop 4:5, upscaled to 1080×1350.
+   Used in: 05 diálogos.
+
+7 — mesas de café en Barcelona
+   Mixkit #29518 — “Empty glass tables in Barcelona”
+   https://mixkit.co/free-stock-video/empty-glass-tables-in-barcelona-29518/
+   720p: https://assets.mixkit.co/videos/29518/29518-720.mp4
+   Crop 4:5 (zoom-out reveal), upscaled to 1080×1350.
+   Used in: 07 mi barrio. Footage real de Barcelona.
+
+9 — balcones en Barcelona
+   Mixkit #29528 — “Balconies in Barcelona”
+   https://mixkit.co/free-stock-video/balconies-in-barcelona-29528/
+   720p: https://assets.mixkit.co/videos/29528/29528-720.mp4
+   Crop 4:5, upscaled to 1080×1350.
+   Used in: 09 atlas de color. Footage real de Barcelona (senyera visible).
+
+Font: Archivo Narrow (Bold / Medium) — already on the box.
+Detector (ideas 04 y 08): YOLOv5n ONNX via onnxruntime (float16), 640 letterbox.

@@ -1,0 +1,20 @@
+{
+ "_nota": "Menos agentes, más decaimiento: venas finas, red más rala. No ajustado mirando la red real.",
+ "agents": 90000,
+ "sensorAngle": 30,
+ "turnAngle": 30,
+ "sensorDist": 12,
+ "stepSize": 1.2,
+ "deposit": 6,
+ "decay": 0.15,
+ "diffuse": 0.8,
+ "food": 25,
+ "foodRadius": 2,
+ "spawn": "estaciones",
+ "spawnRadius": 4,
+ "stepsPerFrame": 3,
+ "expo": 10,
+ "gamma": 1,
+ "cell": 2,
+ "respawn": 0.001
+}
