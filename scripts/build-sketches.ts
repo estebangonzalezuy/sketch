@@ -7,8 +7,9 @@
  *
  * On Vercel this is served at estebangonzalez.co/sketches through a rewrite in the portfolio.
  */
+import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -86,6 +87,21 @@ const SKETCHES: Sketch[] = [
 
 const run = (cmd: string, cwd: string) => execSync(cmd, { cwd, stdio: 'inherit' });
 
+/**
+ * Instala las dependencias del sketch si faltan o si su package-lock.json cambió desde la última
+ * instalación. Vercel restaura node_modules de la caché del build anterior: con solo mirar si la
+ * carpeta existe, un sketch que suma una dependencia se construía con los módulos viejos y fallaba.
+ */
+function installIfStale(src: string) {
+  const lock = resolve(src, 'package-lock.json');
+  const stamp = resolve(src, 'node_modules/.lock-sha');
+  const want = existsSync(lock) ? createHash('sha1').update(readFileSync(lock)).digest('hex') : '';
+  const have = existsSync(stamp) ? readFileSync(stamp, 'utf8') : null;
+  if (have === want) return;
+  run('npm ci --no-audit --no-fund', src);
+  writeFileSync(stamp, want);
+}
+
 mkdirSync(out, { recursive: true });
 
 for (const s of SKETCHES) {
@@ -102,7 +118,7 @@ for (const s of SKETCHES) {
     cpSync(resolve(src, 'index.html'), resolve(dest, 'index.html'));
   } else {
     console.log(`\n▸ ${s.slug}`);
-    if (!existsSync(resolve(src, 'node_modules'))) run('npm ci --no-audit --no-fund', src);
+    installIfStale(src);
     run(`npm run build -- --base=/sketches/${s.slug}/ --outDir=${dest} --emptyOutDir`, src);
   }
 }
