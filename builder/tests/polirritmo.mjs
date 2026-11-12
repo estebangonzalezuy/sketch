@@ -37,13 +37,21 @@ try {
   await page.click(".stage");
   await page.waitForTimeout(600);
   await page.evaluate(() => (window.__whens = [])); // solo eventos del preset nuevo
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(6500); // ciclo de 4 s: la ventana incluye al menos una vuelta del loop
   const whens = await page.evaluate(() => window.__whens);
   const byRing = [0, 1].map((r) => whens.filter((w) => w[0] === r).map((w) => w[1]));
   const gaps = byRing.map((ws) => ws.slice(1).map((v, i) => v - ws[i]));
   const exp = [4 / 3, 4 / 4];
-  const err = gaps.map((g, r) => Math.max(0, ...g.map((d) => Math.abs(d - exp[r]))));
-  ok("cruces analíticos: intervalos = T/n", byRing.every((w) => w.length >= 2) && err.every((e) => e < 0.02), `eventos ${byRing.map((w) => w.length).join("+")}, error máx ${(Math.max(...err) * 1000).toFixed(1)} ms`);
+  // Sin duplicados ni faltantes: todo intervalo a menos de 100 ms de T/n. Analítico: los intervalos son
+  // exactos (< 2 ms) salvo donde el reloj se re-ancla porque un frame se trabó (a lo sumo 1 por anillo aquí).
+  const devs = gaps.map((g, r) => g.map((d) => Math.abs(d - exp[r])));
+  const worst = Math.max(0, ...devs.flat());
+  const inexact = devs.map((d) => d.filter((x) => x > 0.002).length);
+  ok(
+    "cruces analíticos: intervalos = T/n, sin duplicados",
+    byRing.every((w) => w.length >= 4) && worst < 0.1 && inexact.every((n) => n <= 1),
+    `eventos ${byRing.map((w) => w.length).join("+")}, desvío máx ${(worst * 1000).toFixed(1)} ms, intervalos re-anclados ${inexact.join("+")}`,
+  );
   const got = await mi.evaluate(() => window.__miNotes);
   ok("broadcast llega al motion instrument", got > 0, `${got} notas recibidas`);
 

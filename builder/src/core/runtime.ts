@@ -235,7 +235,7 @@ export class Runtime {
   }
   rewind() {
     this.simFrame = -1;
-    this.scheduledTo = -1;
+    this.schedLast = -1;
     this.set({ t: 0 });
     this.dirty = true;
   }
@@ -338,7 +338,7 @@ export class Runtime {
         if (t >= tl.duration) t = tl.loop === "hold" ? tl.duration : t % tl.duration;
         this.dirty = true;
         this.scheduleAhead(t, tl.duration);
-      } else this.scheduledTo = -1;
+      } else this.schedLast = -1;
       if (!this.dirty) return;
       this.dirty = false;
       // cuantizado a 30 fps: lo que se ve es lo que se exporta
@@ -362,27 +362,37 @@ export class Runtime {
     cancelAnimationFrame(this.raf);
   }
 
-  // ── eventos en vivo con lookahead (audio/MIDI). Ventanas sin solaparse, con vuelta de loop. ──
-  private scheduledTo = -1;
+  // ── eventos en vivo con lookahead (audio/MIDI) ──
+  // Se lleva cuánto tiempo por delante de `now` ya está agendado (`schedAhead`), no una posición absoluta:
+  // así la vuelta del loop no reabre la ventana (antes duplicaba el primer golpe de cada ciclo).
+  private schedLast = -1;
+  private schedAhead = 0;
   private scheduleAhead(now: number, duration: number) {
     const env = this.env;
     if (!env?.schedule) return;
     const LOOK = 0.12;
-    let from = this.scheduledTo < 0 ? now : this.scheduledTo;
+    if (this.schedLast < 0) this.schedAhead = 0;
+    else {
+      let elapsed = now - this.schedLast;
+      if (elapsed < 0) elapsed += duration; // vuelta del loop
+      this.schedAhead = elapsed > 0.5 ? 0 : Math.max(0, this.schedAhead - elapsed); // > 0,5 s = salto
+    }
+    this.schedLast = now;
+    const from = now + this.schedAhead;
     const to = now + LOOK;
-    if (from > to + 0.5 || from < now - 0.5) from = now; // salto (rewind, cambio de entorno)
     if (to <= from) return;
     try {
       if (to <= duration) env.schedule(from, to, now, this.params);
+      else if (from >= duration) env.schedule(from - duration, to - duration, now - duration, this.params);
       else {
         // la ventana cruza el final del loop: se parte en dos
-        if (from < duration) env.schedule(from, duration, now, this.params);
-        env.schedule(Math.max(0, from - duration), to - duration, now - duration, this.params);
+        env.schedule(from, duration, now, this.params);
+        env.schedule(0, to - duration, now - duration, this.params);
       }
     } catch (e) {
       console.warn(e);
     }
-    this.scheduledTo = to > duration ? to - duration : to;
+    this.schedAhead = LOOK;
   }
 
   invalidate() {

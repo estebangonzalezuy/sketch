@@ -7,17 +7,19 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test": "node tests/run.mjs && node tests/keys.mjs && node tests/polirritmo.mjs",
+    "test": "node tests/run.mjs && node tests/keys.mjs && node tests/polirritmo.mjs && node tests/gl-compartido.mjs",
     "render": "node scripts/render.mjs",
     "sheet": "node scripts/sheet.mjs",
     "reel": "node scripts/reel.mjs"
   },
   "dependencies": {
+    "@types/three": "^0.187.0",
     "dialkit": "^2.2.0",
     "motion": "^14.12.0",
     "mp4-muxer": "^5.2.2",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
