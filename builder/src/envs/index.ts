@@ -21,6 +21,7 @@ export const ENVS: EnvEntry[] = [
   { num: "07", id: "atractor", title: "atractor", load: () => import("./atractor") },
   { num: "08", id: "polirritmo", title: "polirritmo", load: () => import("./polirritmo") },
   { num: "09", id: "gramatica-de-plantas", title: "gramática de plantas", load: () => import("./gramatica-de-plantas") },
+  { num: "09b", id: "plantas-3d", title: "plantas 3d", load: () => import("./plantas-3d") },
   { num: "10", id: "nervaduras", title: "nervaduras", load: () => import("./nervaduras") },
   { num: "11", id: "metros-por-sueldo", title: "metros por sueldo" },
   { num: "12", id: "estratos", title: "estratos" },

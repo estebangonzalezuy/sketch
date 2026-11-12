@@ -25,3 +25,4 @@
 | Preview a ½ resolución por entorno | Para los pesados (Atractor ~190 ms/frame en el contenedor). Requiere que el entorno sea independiente de la resolución | S | después |
 | Motion Instrument en el mismo origen | Si `postMessage` a themotionsocial.club no alcanza: copiar `tmsc/public/motion-instrument` a este repo (pedido de Esteban) para que ande `BroadcastChannel` / `window.MI` | S | después (fase 3, Polirritmo) |
 | Tema propio de DialKit | Esteban: "no está mal que venga por defecto, después lo modifico" | S | descartada por ahora |
+| Plantas 3D (09b) | Pedido de Esteban el 12/11: entorno nuevo fuera de los 19 originales, con three.js | M | hecha (12/11) |

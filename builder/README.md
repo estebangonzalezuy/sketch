@@ -11,7 +11,7 @@ npm run render -- --env feedback --seconds 10 --out out/feedback.mp4   # camino 
 
 Fuera de la Mac, `CHROME_PATH` apunta al Chrome que usa el render; en la Mac usa el Chrome instalado. `ffmpeg` tiene que estar en el PATH.
 
-Estado (fase 3): core + 01 Limaduras, 05 Superilla, 06 Bifurcación, 07 Atractor, 08 Polirritmo, 09 Gramática de Plantas, 10 Nervaduras, 13 Feedback, 15 Anagrama, 16 Multi-anagrama. Faltan los de datos (02, 03, 11, 12), los de entradas (04, 14, 17) y los slots P1/P2. El Motion Instrument (copia de `tmsc`) vive en `public/motion-instrument/`. Bitácora en `PROCESS.md`.
+Estado (fase 3): core + 01 Limaduras, 05 Superilla, 06 Bifurcación, 07 Atractor, 08 Polirritmo, 09 Gramática de Plantas, 09b Plantas 3D (three.js), 10 Nervaduras, 13 Feedback, 15 Anagrama, 16 Multi-anagrama. Faltan los de datos (02, 03, 11, 12), los de entradas (04, 14, 17) y los slots P1/P2. El Motion Instrument (copia de `tmsc`) vive en `public/motion-instrument/`. Bitácora en `PROCESS.md`.
 
 ---
 

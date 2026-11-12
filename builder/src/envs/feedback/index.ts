@@ -252,6 +252,14 @@ const env: Env<P> = {
     const gl = target.ctx;
     W = ctx.width;
     H = ctx.height;
+    // el contexto es compartido con otros entornos WebGL2 (three.js en Plantas 3D): estado conocido
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.BLEND);
+    gl.disable(gl.SCISSOR_TEST);
+    gl.colorMask(true, true, true, true);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
     if (S && S.gl === gl) freeBuffers(S);
     else
       S = {

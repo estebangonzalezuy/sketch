@@ -12,3 +12,6 @@ Paso 4 de Szymon. Todo lo que aparezca fuera de alcance va acá, no al código. 
 | Export SVG para plotter |  | S | después |
 | Hojas/flores como símbolos tipográficos |  | M | después |
 | Presets curados (3 a 6) | 5 en `src/envs/gramatica-de-plantas/presets.ts` | S | hecha |
+| Versión 3D en three.js | Entorno aparte `plantas-3d` (09b): misma gramática, filotaxis, tubos con dither 1-bit, cámara orbitando | M | hecha (12/11) |
+| El dial `largo` no hace nada | La planta se escala al bounding box, así que el largo del segmento no se ve. Sacarlo (subiendo `version`) o usarlo como proporción tronco/ramas | S | después — decide Esteban |
+| 3D: hojas o remates en las puntas | Sin clipart; quizá esferas dither | S | después |

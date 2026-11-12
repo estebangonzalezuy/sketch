@@ -132,9 +132,15 @@ const env: Env<P> = {
     const T = sub(p);
     const ac = audioClock();
     // ancla estable entre el t del entorno y el reloj de audio: se fija al empezar y solo se rehace
-    // si se desvía más de 50 ms (salto, pausa, vuelta del loop). Sin jitter por frame.
+    // si se desvía más de 50 ms (salto, pausa). Sin jitter por frame.
     const raw = ac.currentTime - now;
-    if (anchor === null || Math.abs(raw - anchor) > 0.05) anchor = raw;
+    if (anchor === null) anchor = raw;
+    else {
+      // en la vuelta del loop el ancla avanza un ciclo EXACTO (no se vuelve a medir: medirla mete el jitter del frame)
+      const loops = Math.round((raw - anchor) / p.ciclo.segundos);
+      if (Math.abs(raw - anchor - loops * p.ciclo.segundos) > 0.05) anchor = raw;
+      else anchor += loops * p.ciclo.segundos;
+    }
     const base = anchor;
     rs.forEach((n, ring) => {
       const per = T / n;

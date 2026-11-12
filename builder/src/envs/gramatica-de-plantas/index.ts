@@ -6,31 +6,11 @@
 import type { Env, EnvContext } from "../../core/env";
 import { font, num } from "../../core/fonts";
 import { mulberry32 } from "../../core/rng";
+import { grammar } from "../_plantas/grammar";
 import { params, type PlantasParams as P } from "./params";
 import { presets } from "./presets";
 
-/** La tabla (para el video): qué hace cada letra. + gira a la izquierda, − a la derecha, [ ] abre y cierra rama. */
-export const TABLA: Record<string, string> = {
-  A: "[+X]", B: "[-X]", C: "F", D: "[++X]", E: "[+X]", F: "[--X]", G: "+X", H: "-X", I: "F[+F]",
-  J: "[-F]", K: "[+X]F", L: "F[-X]", M: "[+X][-X]", N: "[-X]", O: "F", P: "[++X]", Q: "[--X]", R: "+F",
-  S: "[+X]", T: "F[-X]", U: "-F", V: "[+F]", W: "[-X][+X]", X: "[+X]", Y: "[-X]", Z: "+X",
-};
-const MAX_SYMBOLS = 120000;
 const HOLD = 1.5;
-
-function clean(word: string) {
-  return word
-    .toUpperCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // Á → A, Ñ → N
-    .replace(/[^A-Z]/g, "");
-}
-
-function hash(s: string) {
-  let h = 0x811c9dc5;
-  for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
-  return h;
-}
 
 interface Plant {
   rule: string;
@@ -51,50 +31,9 @@ let plant: Plant | null = null;
 function build(p: P, seed: number): Plant {
   const key = JSON.stringify([p.palabra, p.gramática, seed]);
   if (key === cacheKey && plant) return plant;
-  const w = clean(p.palabra);
-  let rule = "F" + [...w].map((c) => TABLA[c] ?? "").join("");
-  let appended = false;
-  const fix: string[] = [];
-  if ((rule.match(/\[[^\]]*X/g) ?? []).length < 1) {
-    rule += "[+X][-X]";
-    fix.push("sin ramas: se agregó [+X][−X]");
-  } else {
-    // ramas de un solo lado: la planta se cae; se agrega la del otro lado (y se dice)
-    const left = /\[\+/.test(rule);
-    const right = /\[-/.test(rule);
-    if (left && !right) {
-      rule += "[-X]";
-      fix.push("ramas solo a la izquierda: se agregó [−X]");
-    } else if (right && !left) {
-      rule += "[+X]";
-      fix.push("ramas solo a la derecha: se agregó [+X]");
-    }
-  }
-  appended = fix.length > 0;
-  rule += "X";
-  const h = hash(w);
-  const angle = p.gramática.ángulo + (((h % 1000) / 1000) * 2 - 1) * 4; // ±4° por palabra
-
-  // expansión con corte duro
-  let depth = Math.round(p.gramática.profundidad);
-  let cut = false;
-  let s = "X";
-  for (;;) {
-    s = "X";
-    let over = false;
-    for (let i = 0; i < depth; i++) {
-      let next = "";
-      for (const c of s) next += c === "X" ? rule : c === "F" ? "FF" : c;
-      s = next;
-      if (s.length > MAX_SYMBOLS) {
-        over = true;
-        break;
-      }
-    }
-    if (!over || depth <= 1) break;
-    depth--;
-    cut = true;
-  }
+  const gr = grammar(p.palabra, p.gramática.profundidad, p.gramática.ángulo);
+  const { rule, fix, depth, cut, angle, hash: h, expanded: s } = gr;
+  const appended = fix.length > 0;
 
   // tortuga
   const rnd = mulberry32(seed ^ h);
