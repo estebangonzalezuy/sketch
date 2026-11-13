@@ -30,8 +30,10 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
 
   const one = config.mode === 'one';
   const candidates = installed.filter((a) => !config.apps.some((b) => b.id === a.id));
+  // De la lista guardada se muestran solo las apps que esta Mac tiene.
+  const apps = installed.length ? config.apps.filter((a) => installed.some((b) => b.id === a.id)) : config.apps;
   const sitesOn = config.sites.filter((s) => s.on).length;
-  const appsOn = config.apps.filter((a) => a.on).length;
+  const appsOn = apps.filter((a) => a.on).length;
   const nothing = one ? !config.one_app : sitesOn + appsOn === 0;
 
   const start = () =>
@@ -77,12 +79,12 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
           />
         ))}
         <div onKeyDown={(e) => e.key === 'Enter' && addSite()}>
-          <TextControl label="Sumar" value={draft} placeholder="reddit.com" onChange={setDraft} />
+          <TextControl label="Sumar sitio" value={draft} placeholder="reddit.com" onChange={setDraft} />
         </div>
         <div className="row">
           <ButtonGroup
             buttons={[
-              { label: 'Sumar sitio', onClick: addSite },
+              { label: 'Sumar', onClick: addSite },
               { label: 'Quitar apagados', onClick: () => update({ sites: config.sites.filter((s) => s.on) }) },
             ]}
           />
@@ -90,8 +92,8 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
       </Folder>
 
       {!one && (
-        <Folder title={`Apps · ${appsOn}`} defaultOpen={false}>
-          {config.apps.map((app) => (
+        <Folder title={`Apps · ${appsOn}`} defaultOpen>
+          {apps.map((app) => (
             <Toggle
               key={app.id}
               label={app.name}
@@ -101,7 +103,7 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
           ))}
           {candidates.length > 0 && (
             <SelectControl
-              label="Sumar"
+              label="Sumar app"
               value=""
               options={[{ value: '', label: 'Elegir app…' }, ...candidates.map((a) => ({ value: a.id, label: a.name }))]}
               onChange={(id) => {

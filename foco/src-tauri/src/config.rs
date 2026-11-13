@@ -59,6 +59,7 @@ impl Config {
         StartArgs {
             minutes: self.minutes,
             mode: Some(self.mode),
+            // Una app de la lista que no está instalada no molesta: nunca corre.
             sites: self.sites.iter().filter(|s| s.on).map(|s| s.domain.clone()).collect(),
             apps: self.apps.iter().filter(|a| a.on).map(|a| a.id.clone()).collect(),
             one_app: self.one_app.as_ref().map(|a| a.id.clone()),
