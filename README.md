@@ -13,6 +13,8 @@ Colección de sketches. Se sirve en `estebangonzalez.co/sketches` (el proyecto `
 | `/sketches/anticipator`          | `anticipator/`                                  |
 | `/sketches/vitro`                | `vitro/`                                        |
 
+Fuera de la colección web: [`foco/`](foco/README.md), una app nativa de macOS (Tauri 2 + DialKit) para bloquear distracciones. No se sirve ni entra en el build.
+
 `npm run build` buildea el Index en `dist/sketches/motion-studios-index/` y después cada sketch con `--base=/sketches/<slug>/`, más la lista. Para sumar un sketch, agregalo a `SKETCHES` en `scripts/build-sketches.ts`. Las rutas a archivos de `public/` desde TS tienen que usar `import.meta.env.BASE_URL`.
 
 ---

@@ -1,0 +1,410 @@
+/* Foco. Negro tinta, blanco y un solo acento, reservado para el estado "en foco".
+   Los controles son los de DialKit sin tocar: acá solo se le pasa la paleta por
+   sus variables y se dibuja lo que DialKit no trae (encabezado, hora, gráfico). */
+
+:root {
+  --ink: #0c0c0c;
+  --accent: #e4fc24;
+  --paper: #ffffff;
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, 'SF Pro Display', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: transparent;
+  color: var(--paper);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+/* Fuera de Tauri (npm run dev en un navegador) el panel se ve sobre un gris
+   de escritorio; en la app, la ventana es transparente. */
+html[data-host='browser'][data-view='panel'] body {
+  min-height: 100vh;
+  padding: 24px;
+  background: #2b2b2b;
+}
+
+/* ── Panel ─────────────────────────────────────────────────────────────── */
+
+.shell {
+  --dial-glass-bg: var(--ink);
+  --dial-dropdown-bg: #171717;
+  width: 340px;
+  padding: 14px 12px 12px;
+  background: var(--ink);
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09);
+  /* Si una vista no entra en la pantalla (las curvas abiertas), se desplaza. */
+  max-height: var(--room, 100vh);
+  overflow: hidden auto;
+  scrollbar-width: none;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dial-row-gap);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2px 6px 10px;
+}
+
+.head h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.link {
+  padding: 0;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--dial-text-tertiary);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--paper);
+  outline: none;
+}
+
+/* DialKit apila sus grupos de botones; acá van lado a lado. */
+.row .dialkit-button-group {
+  flex-direction: row;
+}
+
+.hero {
+  padding: 14px 6px 16px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--dial-text-secondary);
+}
+
+.pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: breathe 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+}
+
+.time {
+  margin: 6px 0 0 -3px;
+  font-size: 68px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.time[data-size='words'] {
+  font-size: 48px;
+  letter-spacing: -0.045em;
+}
+
+.pulse ~ .time,
+.eyebrow:has(.pulse) ~ .time {
+  color: var(--accent);
+}
+
+.bar {
+  height: 2px;
+  margin-top: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 0.3s linear;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  color: var(--dial-text-secondary);
+}
+
+.meta span {
+  color: var(--dial-text-tertiary);
+  white-space: nowrap;
+}
+
+.lead {
+  margin: 8px 6px 0;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.note,
+.caption {
+  margin: 0;
+  padding: 6px 6px 8px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--dial-text-secondary);
+  text-wrap: pretty;
+}
+
+.caption {
+  padding-top: 0;
+  color: var(--dial-text-tertiary);
+}
+
+.note[data-tone='error'] {
+  color: #ff8f7a;
+}
+
+.phrase {
+  margin: 0;
+  padding: 4px 6px 8px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.primary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 46px;
+  margin-top: 6px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--paper);
+  background: var(--dial-surface-hover);
+  border: 0;
+  border-radius: var(--dial-radius);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s cubic-bezier(0.2, 0, 0, 1), background 0.15s;
+}
+
+.primary[data-tone='accent'] {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.primary:hover {
+  background: var(--dial-border-hover);
+}
+
+.primary[data-tone='accent']:hover {
+  background: #e9e9e9;
+}
+
+.primary:active {
+  transform: scale(0.985);
+}
+
+.primary:focus-visible {
+  outline: 2px solid var(--dial-focus-ring);
+  outline-offset: 2px;
+}
+
+.primary:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.primary kbd {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  opacity: 0.5;
+}
+
+/* El historial: siete columnas, una por día. */
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin: 0;
+  padding: 0 6px 8px;
+  list-style: none;
+}
+
+.week li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--dial-text-tertiary);
+}
+
+.week .amount {
+  height: 14px;
+  color: var(--dial-text-secondary);
+}
+
+.week .col {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 96px;
+}
+
+.week .col i {
+  width: 100%;
+  min-height: 2px;
+  background: rgba(255, 255, 255, 0.26);
+  border-radius: 3px 3px 1px 1px;
+  transition: height 0.35s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.week .col i[data-empty='true'] {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.week li[data-today='true'] {
+  color: var(--paper);
+}
+
+.week li[data-today='true'] .col i:not([data-empty='true']) {
+  background: var(--paper);
+}
+
+/* El panel de curvas es un DialRoot en línea: ocupa el ancho y nada más. */
+.dials .dialkit-root {
+  --dial-glass-bg: var(--ink);
+}
+
+/* ── Pantalla de bloqueado ─────────────────────────────────────────────── */
+
+.block {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: clamp(28px, 5vw, 88px);
+  background: var(--ink);
+  color: var(--paper);
+  will-change: clip-path, opacity;
+}
+
+.block-time {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: clamp(18px, 1.9vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.block-time svg {
+  width: 1em;
+  height: 1em;
+  transform: rotate(-90deg) scaleY(-1);
+}
+
+.block-time circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+}
+
+.block-time .track {
+  opacity: 0.22;
+}
+
+.block-body {
+  align-self: end;
+}
+
+.block h1 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.22em;
+  margin: 0 0 0 -0.045em;
+  font-size: clamp(64px, 13.5vw, 260px);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+/* Cada palabra sale de atrás de su línea. El relleno deja lugar a la "y". */
+.block .line {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.04em 0.06em 0.16em 0;
+  margin-bottom: -0.16em;
+}
+
+.block .line > span {
+  display: inline-block;
+  will-change: transform;
+}
+
+.block p {
+  max-width: 34em;
+  margin: clamp(20px, 2.6vw, 44px) 0 0;
+  font-size: clamp(15px, 1.25vw, 20px);
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.block p b {
+  font-weight: 500;
+  color: var(--paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+  }
+}
