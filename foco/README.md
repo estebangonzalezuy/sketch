@@ -23,41 +23,47 @@ Esto se escribió en un contenedor Linux, sin una Mac a mano. Qué se probó y q
 | Helper privilegiado | Prueba de punta a punta con 23 comprobaciones (`scripts/test-helper.sh`), pasa en Linux |
 | App Tauri (bandeja, ventanas, atajo, control de apps) | Chequea tipos contra `aarch64-apple-darwin`. **Nunca se ejecutó** |
 | Interfaz | Probada en un navegador con un helper simulado |
-| `.app`, instalador del helper, `launchd` | **Sin probar**: hay que compilarlo en una Mac |
+| `.app`, `install.command`, `launchd` | **Sin probar**: hay que correrlo en una Mac |
 
 La primera compilación en tu Mac es la prueba real. Lo más probable es que haya detalles para ajustar en lo que nunca corrió: la posición del popover, el nivel de las ventanas y el control de apps.
 
-## Compilar
+## Instalar
 
-Hace falta una Mac con Apple Silicon y macOS 14 o más nuevo, las herramientas de línea de comandos de Xcode, [Rust](https://rustup.rs) y Node 20 o más nuevo.
-
-```bash
-xcode-select --install
-```
+Hace falta una Mac con Apple Silicon y macOS 14 o más nuevo, y [Node](https://nodejs.org) 20 o más nuevo. El instalador se ocupa del resto.
 
 ```bash
-cd foco && npm install
+cd foco && ./install.command
 ```
 
-Para desarrollar, con recarga en caliente:
+También sirve el doble clic sobre `install.command` en el Finder. Hace cinco cosas: revisa que estén las herramientas de Xcode, Rust y Node (ofrece instalar Rust si falta), instala dependencias, compila `Foco.app`, la copia a `/Applications` e instala el helper. Pide tu contraseña una vez, en el último paso. La primera compilación tarda unos minutos.
+
+Para actualizar después de cambiar el código, corré el instalador de nuevo. Para sacar todo:
+
+```bash
+./uninstall.command
+```
+
+Foco no arranca sola al encender la Mac: abrila desde `/Applications`, o sumala en Ajustes del Sistema → General → Ítems de inicio.
+
+### Desarrollar
+
+Con recarga en caliente, sin instalar nada en `/Applications`:
+
+```bash
+npm install
+```
 
 ```bash
 npm run tauri dev
 ```
 
-Para generar `Foco.app`:
-
-```bash
-npm run app
-```
-
-El resultado queda en `src-tauri/target/release/bundle/macos/Foco.app`. Arrastralo a `/Applications`. Está firmado ad hoc; como lo compilaste vos, Gatekeeper no lo frena.
+Para generar solo el `.app`, sin instalarlo: `npm run app`. Queda en `src-tauri/target/release/bundle/macos/Foco.app`, firmado ad hoc.
 
 ## El helper privilegiado
 
 Bloquear sitios para todo el sistema requiere ser administrador. Eso lo hace un programa aparte, `foco-helper`, que corre como root bajo `launchd`. Va incluido dentro de `Foco.app`.
 
-**Instalarlo.** La primera vez que abrís el panel aparece "Falta un paso". El botón **Instalar helper** pide tu contraseña una vez. Si preferís hacerlo a mano:
+**Instalarlo.** `install.command` ya lo hace. Si copiaste la app a mano, el panel muestra "Falta un paso" y el botón **Instalar helper** pide tu contraseña una vez. O desde la Terminal:
 
 ```bash
 sudo /Applications/Foco.app/Contents/Resources/resources/install-helper.sh /Applications/Foco.app/Contents/MacOS/foco-helper
