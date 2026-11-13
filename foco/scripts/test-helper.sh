@@ -30,7 +30,7 @@ check "detecta el intento por TLS (SNI)" "$(req '{"cmd":"status"}' | get 'd["sta
 curl -s --noproxy '*' -m 2 --connect-to www.twitter.com:443:127.0.0.1:18443 https://www.twitter.com/ >/dev/null || true
 sleep 0.3
 check "una pestaña que insiste no suma intentos" "$(req '{"cmd":"status"}' | get 'd["status"]["session"]["attempts"]')" 1
-check "página de bloqueo por HTTP" "$(curl -s --noproxy '*' -m 2 -H 'Host: m.youtube.com' http://127.0.0.1:18080/ | grep -c 'Volvé a lo tuyo')" 1
+check "página de bloqueo por HTTP" "$(curl -s --noproxy '*' -m 2 -H 'Host: m.youtube.com' http://127.0.0.1:18080/ | grep -c 'Back to it')" 1
 sleep 0.3
 check "detecta el intento por HTTP" "$(req '{"cmd":"status"}' | get 'd["status"]["session"]["attempts"], d["status"]["session"]["last_attempt"]["target"]')" "(2, 'youtube.com')"
 curl -s --noproxy '*' -m 2 --connect-to example.com:443:127.0.0.1:18443 https://example.com/ >/dev/null || true
@@ -41,7 +41,7 @@ printf '127.0.0.1\tlocalhost\n' > "$T/hosts"; sleep 1.3
 grep -q '^127.0.0.1 x.com$' "$T/hosts" && ok "repone el bloque si lo borran" || fail "no repuso el bloque"
 
 check "no corta sin frase ni enfriamiento" "$(req '{"cmd":"cancel"}' | get 'd["ok"]')" False
-check "no corta con una frase a medias" "$(req '{"cmd":"cancel","phrase":"Prefiero distraerme"}' | get 'd["ok"]')" False
+check "no corta con una frase a medias" "$(req '{"cmd":"cancel","phrase":"I would rather get distracted"}' | get 'd["ok"]')" False
 check "arranca el enfriamiento" "$(req '{"cmd":"begin_cooldown"}' | get 'd["status"]["session"]["cooldown_started"] is not None')" True
 check "no corta antes de los dos minutos" "$(req '{"cmd":"cancel"}' | get 'd["ok"]')" False
 
@@ -58,6 +58,6 @@ check "el historial tiene la sesión" "$(req '{"cmd":"history"}' | get 'len(d["h
 check "confirma el resumen" "$(req '{"cmd":"ack_summary"}' | get 'd["status"]["last_finished"]')" None
 
 req '{"cmd":"start","minutes":60,"mode":"one","one_app":"com.adobe.AfterEffects","sites":["x.com"]}' >/dev/null
-check "corta con la frase entera" "$(req '{"cmd":"cancel","phrase":"Prefiero distraerme ahora y terminar esto más tarde, con apuro y de mal humor."}' | get 'd["ok"], d["status"]["last_finished"]["cancelled"]')" "(True, True)"
+check "corta con la frase entera" "$(req '{"cmd":"cancel","phrase":"I would rather get distracted now and finish this later, rushed and in a bad mood."}' | get 'd["ok"], d["status"]["last_finished"]["cancelled"]')" "(True, True)"
 check "/etc/hosts limpio después de cortar" "$(grep -c foco "$T/hosts" || true)" 0
 echo "todo bien"

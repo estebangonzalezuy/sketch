@@ -5,7 +5,7 @@ import { useAccent, useConfig, useSnapshot } from './state';
 import { clock, useNow } from './time';
 import { motionOf, tuningOf } from './tuning';
 
-const PHRASE = ['Volvé', 'a', 'lo', 'tuyo.'];
+const PHRASE = ['Back', 'to', 'it.'];
 
 /**
  * La pantalla de bloqueado. Entra cuando se intenta abrir algo prohibido:
@@ -98,10 +98,10 @@ export function Block() {
             >
               {attempt ? (
                 <>
-                  <b>{attempt.target}</b> está en pausa hasta que termine la sesión.
+                  <b>{attempt.target}</b> is paused until the session ends.
                 </>
               ) : (
-                'Así se ve cuando intentás abrir algo que pusiste en pausa.'
+                'This is what you see when you try to open something you paused.'
               )}
             </motion.p>
           </div>

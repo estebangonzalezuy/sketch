@@ -42,7 +42,7 @@ impl Default for Config {
             mode: Mode::List,
             sites: vec![site("x.com"), site("instagram.com"), site("youtube.com"), site("linkedin.com")],
             apps: vec![
-                app("com.apple.MobileSMS", "Mensajes", true),
+                app("com.apple.MobileSMS", "Messages", true),
                 app("com.tinyspeck.slackmacgap", "Slack", true),
                 app("net.whatsapp.WhatsApp", "WhatsApp", false),
                 app("com.hnc.Discord", "Discord", false),
@@ -80,7 +80,7 @@ pub fn load(app: &AppHandle) -> Config {
 }
 
 pub fn save(app: &AppHandle, config: &Config) -> Result<(), String> {
-    let path = path(app).ok_or("no encuentro la carpeta de configuración")?;
+    let path = path(app).ok_or("cannot find the config folder")?;
     if let Some(dir) = path.parent() {
         std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
     }

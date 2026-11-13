@@ -14,14 +14,14 @@ export function Summary({ record, onDismiss, onDone }: { record: SessionRecord; 
   return (
     <>
       <div className="hero">
-        <p className="eyebrow">{record.cancelled ? 'Sesión cortada' : 'Sesión terminada'}</p>
+        <p className="eyebrow">{record.cancelled ? 'Session ended early' : 'Session complete'}</p>
         <p className="time" data-size="words">{span(focused)}</p>
         <p className="meta">
-          {record.cancelled ? `De ${span(record.planned_secs)} previstos` : 'En foco'}
-          <span>{record.attempts === 0 ? 'Ningún intento de salir' : plural(record.attempts, 'intento de salir', 'intentos de salir')}</span>
+          {record.cancelled ? `Of ${span(record.planned_secs)} planned` : 'In focus'}
+          <span>{record.attempts === 0 ? 'No attempts to leave' : plural(record.attempts, 'attempt to leave', 'attempts to leave')}</span>
         </p>
       </div>
-      <Primary onClick={done}>Listo</Primary>
+      <Primary onClick={done}>Done</Primary>
     </>
   );
 }

@@ -20,10 +20,10 @@ export function Running({ session, snifferOk, onChange }: Props) {
 
   const what =
     session.mode === 'one'
-      ? `Solo ${session.one_app_name ?? 'una app'}`
-      : [session.sites.length && plural(session.sites.length, 'sitio', 'sitios'), session.apps.length && plural(session.apps.length, 'app', 'apps')]
+      ? `Only ${session.one_app_name ?? 'one app'}`
+      : [session.sites.length && plural(session.sites.length, 'site', 'sites'), session.apps.length && plural(session.apps.length, 'app', 'apps')]
           .filter(Boolean)
-          .join(' y ') + ' en pausa';
+          .join(' and ') + ' paused';
 
   const run = (p: Promise<Snapshot>) => p.then(onChange).catch((e) => setError(String(e)));
   const typed = phrase.trim().replace(/\s+/g, ' ') === CANCEL_PHRASE;
@@ -33,7 +33,7 @@ export function Running({ session, snifferOk, onChange }: Props) {
       <div className="hero">
         <p className="eyebrow">
           <i className="pulse" />
-          En foco
+          In focus
         </p>
         <p className="time">{clock(left)}</p>
         <div className="bar">
@@ -41,34 +41,34 @@ export function Running({ session, snifferOk, onChange }: Props) {
         </div>
         <p className="meta">
           {what}
-          <span>{session.attempts === 0 ? 'Sin intentos' : plural(session.attempts, 'intento', 'intentos')}</span>
+          <span>{session.attempts === 0 ? 'No attempts' : plural(session.attempts, 'attempt', 'attempts')}</span>
         </p>
       </div>
 
       {!snifferOk && session.sites.length > 0 && (
-        <Note>Los puertos 80 y 443 locales están ocupados: los sitios se bloquean igual, pero no voy a ver los intentos.</Note>
+        <Note>Local ports 80 and 443 are taken: sites are still blocked, but attempts will not be detected.</Note>
       )}
 
-      <Folder title="Cortar la sesión" defaultOpen={false}>
+      <Folder title="End session early" defaultOpen={false}>
         <p className="phrase">{CANCEL_PHRASE}</p>
         {/* La frase se escribe: pegarla o arrastrarla no vale. */}
         <div onPaste={(e) => e.preventDefault()} onDrop={(e) => e.preventDefault()}>
-          <TextControl label="Frase" value={phrase} placeholder="Escribila entera" onChange={setPhrase} />
+          <TextControl label="Phrase" value={phrase} placeholder="Type all of it" onChange={setPhrase} />
         </div>
         <ButtonGroup
           buttons={[
             typed
-              ? { label: 'Cortar', onClick: () => void run(call('cancel', { phrase })) }
-              : { label: `Faltan ${Math.max(0, CANCEL_PHRASE.length - phrase.trim().length)} letras`, onClick: () => setError('La frase todavía no coincide.') },
+              ? { label: 'End session', onClick: () => void run(call('cancel', { phrase })) }
+              : { label: `${Math.max(0, CANCEL_PHRASE.length - phrase.trim().length)} characters to go`, onClick: () => setError('The phrase does not match yet.') },
           ]}
         />
         <ButtonGroup
           buttons={[
             cooling == null
-              ? { label: 'O esperar 2 minutos', onClick: () => void run(call('begin_cooldown')) }
+              ? { label: 'Or wait 2 minutes', onClick: () => void run(call('begin_cooldown')) }
               : cooling > 0
-                ? { label: `Podés cortar en ${clock(cooling)}`, onClick: () => {} }
-                : { label: 'Cortar ahora', onClick: () => void run(call('cancel', { phrase: null })) },
+                ? { label: `You can end it in ${clock(cooling)}`, onClick: () => {} }
+                : { label: 'End now', onClick: () => void run(call('cancel', { phrase: null })) },
           ]}
         />
         {error && <Note tone="error">{error}</Note>}

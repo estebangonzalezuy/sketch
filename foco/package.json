@@ -1,7 +1,7 @@
 {
   "name": "foco",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Foco: bloqueador de distracciones para la barra de menú de macOS. Tauri 2 (Rust) + React + DialKit.",
   "scripts": {

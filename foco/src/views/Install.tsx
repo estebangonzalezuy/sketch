@@ -14,21 +14,21 @@ export function Install({ snap, onDone }: { snap: Snapshot; onDone: (s: Snapshot
     setError(null);
     call('install_helper')
       .then(onDone)
-      .catch((e) => setError(String(e) === 'cancelado' ? null : String(e)))
+      .catch((e) => setError(String(e) === 'cancelled' ? null : String(e)))
       .finally(() => setBusy(false));
   };
 
   return (
     <>
       <Header title="Foco" />
-      <p className="lead">{outdated ? 'El helper quedó viejo.' : 'Falta un paso.'}</p>
+      <p className="lead">{outdated ? 'The helper is out of date.' : 'One step left.'}</p>
       <Note>
-        Para bloquear sitios en todos los navegadores, Foco instala un helper que corre como administrador. Es lo que hace que el bloqueo siga
-        aunque cierres la app. macOS te va a pedir la contraseña una sola vez.
+        To block sites in every browser, Foco installs a helper that runs as administrator. It is what keeps the block going even if you quit
+        the app. macOS will ask for your password once.
       </Note>
       {error && <Note tone="error">{error}</Note>}
       <Primary tone="accent" disabled={busy} onClick={install}>
-        {busy ? 'Instalando…' : outdated ? 'Actualizar helper' : 'Instalar helper'}
+        {busy ? 'Installing…' : outdated ? 'Update helper' : 'Install helper'}
       </Primary>
     </>
   );

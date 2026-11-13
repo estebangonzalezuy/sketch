@@ -301,10 +301,10 @@ async fn install_helper(app: AppHandle) -> Result<Snapshot, String> {
     let helper = std::env::current_exe()
         .map_err(|e| e.to_string())?
         .parent()
-        .ok_or("no encuentro la carpeta de la app")?
+        .ok_or("cannot find the app folder")?
         .join("foco-helper");
     if !helper.exists() {
-        return Err(format!("falta el helper en {}", helper.display()));
+        return Err(format!("helper missing at {}", helper.display()));
     }
     mac::run_as_admin(&script, &helper)?;
     // launchd tarda un instante en levantar el daemon.
@@ -343,7 +343,7 @@ fn hide_block(app: AppHandle) {
 #[tauri::command]
 fn quit(app: AppHandle, shared: State<Shared>) -> Result<(), String> {
     if shared.snapshot.lock().unwrap().session.is_some() {
-        return Err("hay una sesión en curso".into());
+        return Err("a session is running".into());
     }
     app.exit(0);
     Ok(())

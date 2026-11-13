@@ -63,4 +63,4 @@ export type Config = {
 };
 
 export const COOLDOWN_SECS = 120;
-export const CANCEL_PHRASE = 'Prefiero distraerme ahora y terminar esto más tarde, con apuro y de mal humor.';
+export const CANCEL_PHRASE = 'I would rather get distracted now and finish this later, rushed and in a bad mood.';

@@ -22,7 +22,7 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
 
   const addSite = () => {
     const domain = domainOf(draft);
-    if (!domain) return setError(draft.trim() ? `"${draft.trim()}" no parece un sitio.` : null);
+    if (!domain) return setError(draft.trim() ? `"${draft.trim()}" does not look like a site.` : null);
     if (!config.sites.some((s) => s.domain === domain)) update({ sites: [...config.sites, { domain, on: true }] });
     setDraft('');
     setError(null);
@@ -44,18 +44,18 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
 
   return (
     <>
-      <Header title="Foco" action="Historial" onAction={onHistory} />
+      <Header title="Foco" action="History" onAction={onHistory} />
 
       <div className="row">
         <ButtonGroup buttons={[25, 50, 90].map((m) => ({ label: `${m} min`, onClick: () => update({ minutes: m }) }))} />
       </div>
-      <Slider label="Minutos" value={config.minutes} min={5} max={180} step={5} onChange={(minutes) => update({ minutes })} />
+      <Slider label="Minutes" value={config.minutes} min={5} max={180} step={5} onChange={(minutes) => update({ minutes })} />
       <SelectControl
-        label="Modo"
+        label="Mode"
         value={config.mode}
         options={[
-          { value: 'list', label: 'Lista' },
-          { value: 'one', label: 'Una cosa' },
+          { value: 'list', label: 'List' },
+          { value: 'one', label: 'One thing' },
         ]}
         onChange={(mode) => update({ mode: mode as Mode })}
       />
@@ -64,12 +64,12 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
         <SelectControl
           label="App"
           value={config.one_app?.id ?? ''}
-          options={[...(config.one_app ? [] : [{ value: '', label: 'Elegir…' }]), ...installed.map((a) => ({ value: a.id, label: a.name }))]}
+          options={[...(config.one_app ? [] : [{ value: '', label: 'Choose…' }]), ...installed.map((a) => ({ value: a.id, label: a.name }))]}
           onChange={(id) => update({ one_app: installed.find((a) => a.id === id) ?? null })}
         />
       )}
 
-      <Folder title={`Sitios · ${sitesOn}`} defaultOpen={!one}>
+      <Folder title={`Sites · ${sitesOn}`} defaultOpen={!one}>
         {config.sites.map((site) => (
           <Toggle
             key={site.domain}
@@ -79,13 +79,13 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
           />
         ))}
         <div onKeyDown={(e) => e.key === 'Enter' && addSite()}>
-          <TextControl label="Sumar sitio" value={draft} placeholder="reddit.com" onChange={setDraft} />
+          <TextControl label="Add site" value={draft} placeholder="reddit.com" onChange={setDraft} />
         </div>
         <div className="row">
           <ButtonGroup
             buttons={[
-              { label: 'Sumar', onClick: addSite },
-              { label: 'Quitar apagados', onClick: () => update({ sites: config.sites.filter((s) => s.on) }) },
+              { label: 'Add', onClick: addSite },
+              { label: 'Remove disabled', onClick: () => update({ sites: config.sites.filter((s) => s.on) }) },
             ]}
           />
         </div>
@@ -96,32 +96,32 @@ export function Setup({ config, update, onStart, onHistory }: Props) {
           {apps.map((app) => (
             <Toggle
               key={app.id}
-              label={app.name}
+              label={installed.find((a) => a.id === app.id)?.name ?? app.name}
               checked={app.on}
               onChange={(on) => update({ apps: config.apps.map((a) => (a.id === app.id ? { ...a, on } : a)) })}
             />
           ))}
           {candidates.length > 0 && (
             <SelectControl
-              label="Sumar app"
+              label="Add app"
               value=""
-              options={[{ value: '', label: 'Elegir app…' }, ...candidates.map((a) => ({ value: a.id, label: a.name }))]}
+              options={[{ value: '', label: 'Choose app…' }, ...candidates.map((a) => ({ value: a.id, label: a.name }))]}
               onChange={(id) => {
                 const app = candidates.find((a) => a.id === id);
                 if (app) update({ apps: [...config.apps, { ...app, on: true }] });
               }}
             />
           )}
-          <ButtonGroup buttons={[{ label: 'Quitar apagadas', onClick: () => update({ apps: config.apps.filter((a) => a.on) }) }]} />
+          <ButtonGroup buttons={[{ label: 'Remove disabled', onClick: () => update({ apps: config.apps.filter((a) => a.on) }) }]} />
         </Folder>
       )}
 
-      <ColorControl label="Acento" value={config.accent} onChange={(accent) => update({ accent })} />
+      <ColorControl label="Accent" value={config.accent} onChange={(accent) => update({ accent })} />
 
       {error && <Note tone="error">{error}</Note>}
-      {one && <Note>Las demás apps se ocultan y vuelven a ocultarse si las abrís. Los sitios prendidos también se bloquean.</Note>}
+      {one && <Note>Every other app is hidden, and hidden again if you open it. Sites that are on stay blocked too.</Note>}
       <Primary tone="accent" hint="⌥⌘F" disabled={nothing} onClick={start}>
-        Empezar
+        Start
       </Primary>
     </>
   );

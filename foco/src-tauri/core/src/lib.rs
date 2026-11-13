@@ -23,7 +23,7 @@ pub const MAX_MINUTES: u32 = 480;
 
 /// La frase que hay que escribir, entera, para cortar una sesión.
 pub const CANCEL_PHRASE: &str =
-    "Prefiero distraerme ahora y terminar esto más tarde, con apuro y de mal humor.";
+    "I would rather get distracted now and finish this later, rushed and in a bad mood.";
 
 pub fn phrase_matches(input: &str) -> bool {
     let norm = |s: &str| s.split_whitespace().collect::<Vec<_>>().join(" ");
@@ -38,7 +38,7 @@ mod tests {
     fn phrase_needs_every_word() {
         assert!(phrase_matches(CANCEL_PHRASE));
         assert!(phrase_matches(&format!("  {}  ", CANCEL_PHRASE.replace(' ', "  "))));
-        assert!(!phrase_matches("Prefiero distraerme ahora"));
+        assert!(!phrase_matches("I would rather get distracted now"));
         assert!(!phrase_matches(&CANCEL_PHRASE.to_lowercase()));
         assert!(!phrase_matches(""));
     }

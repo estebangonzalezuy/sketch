@@ -130,30 +130,30 @@ impl Daemon {
 
     fn start(&mut self, args: StartArgs) -> Result<(), String> {
         if self.saved.session.is_some() {
-            return Err("ya hay una sesión en curso".into());
+            return Err("a session is already running".into());
         }
         if !(foco_core::MIN_MINUTES..=foco_core::MAX_MINUTES).contains(&args.minutes) {
-            return Err(format!("la duración va de {} a {} minutos", foco_core::MIN_MINUTES, foco_core::MAX_MINUTES));
+            return Err(format!("duration must be between {} and {} minutes", foco_core::MIN_MINUTES, foco_core::MAX_MINUTES));
         }
         let mut sites = Vec::new();
         for raw in &args.sites {
-            let site = hosts::normalize(raw).ok_or_else(|| format!("sitio inválido: {raw:?}"))?;
+            let site = hosts::normalize(raw).ok_or_else(|| format!("invalid site: {raw:?}"))?;
             if !sites.contains(&site) {
                 sites.push(site);
             }
         }
         if sites.len() > 200 {
-            return Err("demasiados sitios".into());
+            return Err("too many sites".into());
         }
         let bundle_ok = |id: &str| {
             !id.is_empty() && id.len() <= 200 && id.bytes().all(|b| b.is_ascii_alphanumeric() || b"-._".contains(&b))
         };
         if let Some(bad) = args.apps.iter().chain(args.one_app.iter()).find(|id| !bundle_ok(id)) {
-            return Err(format!("app inválida: {bad:?}"));
+            return Err(format!("invalid app: {bad:?}"));
         }
         let mode = args.mode.unwrap_or(Mode::List);
         if mode == Mode::One && args.one_app.is_none() {
-            return Err("el modo una cosa necesita una app".into());
+            return Err("one thing mode needs an app".into());
         }
         let started = now();
         self.saved.session = Some(Session {
@@ -203,13 +203,13 @@ impl Daemon {
     }
 
     fn cancel(&mut self, phrase: Option<String>) -> Result<(), String> {
-        let Some(s) = &self.saved.session else { return Err("no hay sesión".into()) };
+        let Some(s) = &self.saved.session else { return Err("no session".into()) };
         let cooled = s.cooldown_started.is_some_and(|c| now() >= c + foco_core::COOLDOWN_SECS);
         match phrase {
             Some(p) if foco_core::phrase_matches(&p) => {}
-            Some(_) => return Err("la frase no coincide".into()),
+            Some(_) => return Err("the phrase does not match".into()),
             None if cooled => {}
-            None => return Err("el enfriamiento todavía no terminó".into()),
+            None => return Err("the cooldown is not over yet".into()),
         }
         self.finish(true);
         Ok(())
@@ -267,7 +267,7 @@ impl Daemon {
                     }
                     Ok(())
                 }
-                None => Err("no hay sesión".into()),
+                None => Err("no session".into()),
             },
             Request::Cancel { phrase } => self.cancel(phrase),
             Request::Attempt { target } => {
@@ -346,7 +346,7 @@ fn keep_app_alive() {}
 
 const BLOCKED_PAGE: &str = "<!doctype html><meta charset=utf-8><title>Foco</title>\
 <body style=\"margin:0;height:100vh;display:grid;place-items:center;background:#0C0C0C;color:#fff;\
-font:500 48px system-ui,sans-serif;letter-spacing:-0.03em\">Volvé a lo tuyo.";
+font:500 48px system-ui,sans-serif;letter-spacing:-0.03em\">Back to it.";
 
 fn handle_conn(daemon: Arc<Mutex<Daemon>>, mut conn: TcpStream) {
     let _ = conn.set_nonblocking(false);
@@ -420,7 +420,7 @@ fn serve(daemon: Arc<Mutex<Daemon>>, listener: UnixListener) {
                 Ok(req) => daemon.lock().unwrap().handle(req),
                 Err(e) => {
                     let status = daemon.lock().unwrap().status();
-                    Response { ok: false, error: Some(format!("pedido inválido: {e}")), status, history: None }
+                    Response { ok: false, error: Some(format!("invalid request: {e}")), status, history: None }
                 }
             };
             if let Ok(mut out) = serde_json::to_string(&response) {

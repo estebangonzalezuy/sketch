@@ -4,13 +4,13 @@
 #   sudo ./install-helper.sh /ruta/a/foco-helper
 set -euo pipefail
 
-SRC="${1:?falta la ruta al binario foco-helper}"
+SRC="${1:?missing path to the foco-helper binary}"
 LABEL=co.estebangonzalez.foco.helper
 DST="/Library/PrivilegedHelperTools/$LABEL"
 PLIST="/Library/LaunchDaemons/$LABEL.plist"
 
-[ "$(id -u)" = 0 ] || { echo "hay que correrlo con sudo" >&2; exit 1; }
-[ -f "$SRC" ] || { echo "no existe $SRC" >&2; exit 1; }
+[ "$(id -u)" = 0 ] || { echo "run this with sudo" >&2; exit 1; }
+[ -f "$SRC" ] || { echo "$SRC does not exist" >&2; exit 1; }
 
 launchctl bootout "system/$LABEL" 2>/dev/null || true
 
@@ -36,4 +36,4 @@ chown root:wheel "$PLIST"
 chmod 644 "$PLIST"
 
 launchctl bootstrap system "$PLIST"
-echo "helper instalado"
+echo "helper installed"

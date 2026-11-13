@@ -4,7 +4,7 @@
 set -euo pipefail
 
 LABEL=co.estebangonzalez.foco.helper
-[ "$(id -u)" = 0 ] || { echo "hay que correrlo con sudo" >&2; exit 1; }
+[ "$(id -u)" = 0 ] || { echo "run this with sudo" >&2; exit 1; }
 
 launchctl bootout "system/$LABEL" 2>/dev/null || true
 rm -f "/Library/LaunchDaemons/$LABEL.plist" "/Library/PrivilegedHelperTools/$LABEL" /var/run/foco.sock
@@ -18,4 +18,4 @@ fi
 
 # El historial queda en /Library/Application Support/Foco; borralo a mano si querés.
 rm -f "/Library/Application Support/Foco/state.json"
-echo "helper desinstalado"
+echo "helper uninstalled"

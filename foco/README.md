@@ -63,7 +63,7 @@ Para generar solo el `.app`, sin instalarlo: `npm run app`. Queda en `src-tauri/
 
 Bloquear sitios para todo el sistema requiere ser administrador. Eso lo hace un programa aparte, `foco-helper`, que corre como root bajo `launchd`. Va incluido dentro de `Foco.app`.
 
-**Instalarlo.** `install.command` ya lo hace. Si copiaste la app a mano, el panel muestra "Falta un paso" y el botón **Instalar helper** pide tu contraseña una vez. O desde la Terminal:
+**Instalarlo.** `install.command` ya lo hace. Si copiaste la app a mano, el panel muestra "One step left" y el botón **Install helper** pide tu contraseña una vez. O desde la Terminal:
 
 ```bash
 sudo /Applications/Foco.app/Contents/Resources/resources/install-helper.sh /Applications/Foco.app/Contents/MacOS/foco-helper

@@ -60,7 +60,7 @@ const fake: { snap: Snapshot; config: Config; history: SessionRecord[] } = {
     mode: 'list',
     sites: ['x.com', 'instagram.com', 'youtube.com', 'linkedin.com'].map((domain) => ({ domain, on: true })),
     apps: [
-      { id: 'com.apple.MobileSMS', name: 'Mensajes', on: true },
+      { id: 'com.apple.MobileSMS', name: 'Messages', on: true },
       { id: 'com.tinyspeck.slackmacgap', name: 'Slack', on: true },
       { id: 'net.whatsapp.WhatsApp', name: 'WhatsApp', on: false },
     ],
@@ -145,9 +145,9 @@ async function mock(cmd: keyof Commands, args: unknown): Promise<unknown> {
       if (s && !s.cooldown_started) s.cooldown_started = now();
       break;
     case 'cancel':
-      if (!s) throw 'no hay sesión';
-      if (a.phrase != null && a.phrase.trim() !== CANCEL_PHRASE) throw 'la frase no coincide';
-      if (a.phrase == null && !(s.cooldown_started && now() >= s.cooldown_started + COOLDOWN_SECS)) throw 'el enfriamiento todavía no terminó';
+      if (!s) throw 'no session';
+      if (a.phrase != null && a.phrase.trim() !== CANCEL_PHRASE) throw 'the phrase does not match';
+      if (a.phrase == null && !(s.cooldown_started && now() >= s.cooldown_started + COOLDOWN_SECS)) throw 'the cooldown is not over yet';
       finish(true);
       break;
     case 'ack_summary':

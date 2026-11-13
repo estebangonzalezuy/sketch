@@ -5,7 +5,7 @@ import { plural, span } from '../time';
 import type { SessionRecord } from '../types';
 import { Header } from './parts';
 
-const DAYS = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /** El lunes a las 00:00 de la semana de `date`, corrido `offset` semanas. */
 function monday(date: Date, offset: number): Date {
@@ -38,24 +38,24 @@ export function History({ onBack }: { onBack: () => void }) {
   const end = new Date(week.start.getFullYear(), week.start.getMonth(), week.start.getDate() + 6);
   const label =
     offset === 0
-      ? 'Esta semana'
+      ? 'This week'
       : offset === -1
-        ? 'La semana pasada'
-        : `${week.start.getDate()} al ${end.getDate()} de ${end.toLocaleDateString('es', { month: 'long' })}`;
+        ? 'Last week'
+        : `${week.start.toLocaleDateString('en', { month: 'short', day: 'numeric' })} to ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}`;
 
   return (
     <>
-      <Header title="Historial" action="Volver" onAction={onBack} />
+      <Header title="History" action="Back" onAction={onBack} />
       <div className="hero">
         <p className="eyebrow">{label}</p>
         <p className="time" data-size="words">{span(total)}</p>
         <p className="meta">
-          {week.sessions === 0 ? 'Sin sesiones' : plural(week.sessions, 'sesión', 'sesiones')}
-          <span>{week.attempts === 0 ? 'Sin intentos' : plural(week.attempts, 'intento', 'intentos')}</span>
+          {week.sessions === 0 ? 'No sessions' : plural(week.sessions, 'session', 'sessions')}
+          <span>{week.attempts === 0 ? 'No attempts' : plural(week.attempts, 'attempt', 'attempts')}</span>
         </p>
       </div>
 
-      <ol className="week" aria-label="Tiempo en foco por día">
+      <ol className="week" aria-label="Focus time per day">
         {week.days.map((secs, i) => (
           <li key={i} data-today={i === today} title={`${DAYS[i]}: ${span(secs)}`}>
             <span className="amount">{secs > 0 ? Math.round(secs / 60) : ''}</span>
@@ -66,13 +66,13 @@ export function History({ onBack }: { onBack: () => void }) {
           </li>
         ))}
       </ol>
-      <p className="caption">Minutos en foco por día.</p>
+      <p className="caption">Minutes in focus per day.</p>
 
       <div className="row">
         <ButtonGroup
           buttons={[
-            { label: 'Anterior', onClick: () => setOffset((o) => o - 1) },
-            { label: 'Siguiente', onClick: () => setOffset((o) => Math.min(0, o + 1)) },
+            { label: 'Previous', onClick: () => setOffset((o) => o - 1) },
+            { label: 'Next', onClick: () => setOffset((o) => Math.min(0, o + 1)) },
           ]}
         />
       </div>

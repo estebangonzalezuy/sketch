@@ -183,7 +183,7 @@ pub fn run_as_admin(script: &Path, arg: &Path) -> Result<(), String> {
     let lit = |p: &Path| format!("\"{}\"", p.to_string_lossy().replace('\\', "\\\\").replace('"', "\\\""));
     let source = format!(
         "do shell script \"/bin/bash \" & quoted form of {} & \" \" & quoted form of {} \
-         with prompt \"Foco necesita instalar su helper para bloquear sitios en todos los navegadores.\" \
+         with prompt \"Foco needs to install its helper to block sites in every browser.\" \
          with administrator privileges",
         lit(script),
         lit(arg)
@@ -197,7 +197,7 @@ pub fn run_as_admin(script: &Path, arg: &Path) -> Result<(), String> {
     } else {
         let err = String::from_utf8_lossy(&out.stderr);
         if err.contains("-128") {
-            Err("cancelado".into())
+            Err("cancelled".into())
         } else {
             Err(err.trim().to_string())
         }
