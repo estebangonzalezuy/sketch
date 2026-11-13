@@ -18,6 +18,8 @@ export function Panel() {
   const [config, update] = useConfig();
   const [view, setView] = useState<View>(() => (new URLSearchParams(location.search).get('panel') as View) ?? 'main');
   const shell = useRef<HTMLDivElement>(null);
+  // El resumen que ya se cerró con "Listo", por si el helper tarda en enterarse.
+  const [dismissed, setDismissed] = useState<number | null>(null);
   useAccent(config);
 
   useEffect(() => on('view', setView), []);
@@ -59,9 +61,9 @@ export function Panel() {
   } else if (snap.session) {
     key = 'running';
     body = <Running session={snap.session} snifferOk={snap.sniffer_ok} onChange={setSnap} />;
-  } else if (snap.last_finished) {
+  } else if (snap.last_finished && snap.last_finished.id !== dismissed) {
     key = 'summary';
-    body = <Summary record={snap.last_finished} onDone={setSnap} />;
+    body = <Summary record={snap.last_finished} onDismiss={() => setDismissed(snap.last_finished!.id)} onDone={setSnap} />;
   } else {
     key = 'setup';
     body = <Setup config={config} update={update} onStart={setSnap} onHistory={() => setView('history')} />;

@@ -144,6 +144,27 @@ fn refresh(app: &AppHandle) -> Snapshot {
     snap
 }
 
+/// Oculta el panel. Si estaba mostrando el resumen de una sesión terminada,
+/// lo da por visto: la próxima vez el panel abre listo para empezar otra.
+fn dismiss_panel(app: &AppHandle) {
+    if let Some(win) = panel(app) {
+        let _ = win.hide();
+    }
+    let shared = app.state::<Shared>();
+    let pending = {
+        let snap = shared.snapshot.lock().unwrap();
+        snap.session.is_none() && snap.last_finished.is_some()
+    };
+    if pending {
+        let handle = app.clone();
+        std::thread::spawn(move || {
+            if client::request(foco_core::SOCKET_PATH, &Request::AckSummary).is_ok() {
+                refresh(&handle);
+            }
+        });
+    }
+}
+
 fn panel(app: &AppHandle) -> Option<WebviewWindow> {
     app.get_webview_window("panel")
 }
@@ -305,9 +326,7 @@ fn resize_panel(app: AppHandle, height: f64) {
 
 #[tauri::command]
 fn hide_panel(app: AppHandle) {
-    if let Some(win) = panel(&app) {
-        let _ = win.hide();
-    }
+    dismiss_panel(&app);
 }
 
 #[tauri::command]
@@ -355,9 +374,7 @@ fn build_windows(app: &AppHandle) -> tauri::Result<()> {
                 return;
             }
             *shared.blurred.lock().unwrap() = Some(Instant::now());
-            if let Some(win) = handle.get_webview_window("panel") {
-                let _ = win.hide();
-            }
+            dismiss_panel(&handle);
         }
     });
 
@@ -390,9 +407,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
             let just_closed = shared.blurred.lock().unwrap().is_some_and(|t| t.elapsed() < Duration::from_millis(250));
             let visible = panel(app).and_then(|w| w.is_visible().ok()).unwrap_or(false);
             if visible {
-                if let Some(win) = panel(app) {
-                    let _ = win.hide();
-                }
+                dismiss_panel(app);
             } else if !just_closed {
                 // ⌥ clic abre el panel oculto de curvas.
                 show_panel(app, if mac::option_down() { "tuning" } else { "main" });
@@ -402,11 +417,11 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     Ok(())
 }
 
-/// ⌥⌘F: sin sesión, arranca una con lo último que se eligió. Con sesión (o
-/// sin helper), abre el panel.
+/// ⌥⌘F: sin sesión, arranca una con lo último que se eligió (aunque quede un
+/// resumen sin cerrar). Con sesión, o sin helper, abre el panel.
 fn on_shortcut(app: &AppHandle) {
     let snap = app.state::<Shared>().snapshot.lock().unwrap().clone();
-    if snap.helper == "ok" && snap.session.is_none() && snap.last_finished.is_none() {
+    if snap.helper == "ok" && snap.session.is_none() {
         if start_session(app).is_ok() {
             return;
         }
